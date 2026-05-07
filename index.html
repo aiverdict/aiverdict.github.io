@@ -1,9 +1,2388 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>AIVerdict</title>
-  </head>
-  <body>
-    <h1>Hello AIVerdict 👋</h1>
-  </body>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Verdict - Compare ChatGPT, Claude, Gemini and Perplexity Side-by-Side</title>
+    <meta name="description"
+        content="AI Verdict is a Chrome extension that queries ChatGPT, Claude, Gemini, and Perplexity simultaneously, then synthesizes a consensus verdict. No API keys required.">
+    <meta name="keywords"
+        content="AI comparison tool, compare ChatGPT Claude Gemini Perplexity, AI Chrome extension, LLM comparison, AI consensus, AI verdict">
+    <link rel="canonical" href="https://aiverdict.github.io/">
+    <link rel="icon" type="image/png" href="icon-128.png">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://aiverdict.github.io/">
+    <meta property="og:site_name" content="AI Verdict">
+    <meta property="og:title" content="AI Verdict - Compare 4 AI Models Side-by-Side">
+    <meta property="og:description"
+        content="Type one prompt. Get answers from ChatGPT, Claude, Gemini, and Perplexity simultaneously, then let The Verdict Engine synthesize a consensus.">
+    <meta property="og:image" content="https://aiverdict.github.io/screenshots/screenshot-dashboard.png">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AI Verdict - Compare 4 AI Models Side-by-Side">
+    <meta name="twitter:description"
+        content="Type one prompt. Get answers from ChatGPT, Claude, Gemini, and Perplexity simultaneously.">
+    <meta name="twitter:image" content="https://aiverdict.github.io/screenshots/screenshot-dashboard.png">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "AI Verdict",
+      "url": "https://aiverdict.github.io/",
+      "operatingSystem": "Chrome",
+      "applicationCategory": "BrowserApplication",
+      "description": "Compare ChatGPT, Claude, Gemini, and Perplexity side-by-side with a single prompt. Pro tier includes The Verdict Engine for AI consensus synthesis.",
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "Free",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        {
+          "@type": "Offer",
+          "name": "Pro Lifetime",
+          "price": "39.99",
+          "priceCurrency": "USD"
+        }
+      ]
+    }
+    </script>
+
+    <!-- Microsoft Clarity -->
+    <script type="text/javascript">
+        (function (c, l, a, r, i, t, y) {
+            c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+            t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+            y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+        })(window, document, "clarity", "script", "wmemi8b4lp");
+    </script>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-K0Q7H609K9"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-K0Q7H609K9');
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+
+        .glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .ai-scroll::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .ai-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .ai-scroll::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.25);
+            border-radius: 2px;
+        }
+
+        .ai-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(148, 163, 184, 0.45);
+        }
+
+        .ss-panel {
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .ss-panel.ss-visible {
+            opacity: 1;
+            position: relative;
+            pointer-events: auto;
+        }
+
+        .ss-img {
+            image-rendering: -webkit-optimize-contrast;
+            cursor: zoom-in;
+        }
+
+        #ss-lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(6px);
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        #ss-lightbox.open {
+            display: flex;
+        }
+
+        #ss-lightbox img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.8);
+            cursor: zoom-out;
+        }
+
+        #ss-lightbox-close {
+            position: fixed;
+            top: 20px;
+            right: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 24px;
+            line-height: 1;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            z-index: 10000;
+        }
+
+        #ss-lightbox-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .hero-gradient {
+            background: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+        }
+
+        .text-glow {
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+
+        .feature-card {
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        details summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details summary {
+            list-style: none;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen hero-gradient overflow-x-hidden scroll-smooth">
+
+    <!-- Navbar -->
+    <nav class="fixed top-0 w-full z-50 glass">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                <img src="icon-128.png" alt="AI Verdict Logo" class="w-8 h-8 rounded-lg shadow-lg">
+                <span class="text-xl font-bold tracking-tight">AI Verdict</span>
+            </a>
+            <div class="hidden md:flex gap-8 text-sm font-medium text-slate-400">
+                <a href="#how-it-works" class="hover:text-white transition-colors">How it Works</a>
+                <a href="#features" class="hover:text-white transition-colors">Features</a>
+                <a href="#verdict-engine" class="hover:text-white transition-colors">The Verdict</a>
+                <a href="#pricing" class="hover:text-white transition-colors">Pricing</a>
+                <a href="#faq" class="hover:text-white transition-colors">FAQ</a>
+            </div>
+            <a href="https://aiverdict.lemonsqueezy.com/checkout/buy/1f2a6fac-df98-4671-b08b-9106aafd8aeb"
+                target="_blank" rel="noopener" onclick="gtag('event', 'pro_click', { location: 'navbar' })"
+                class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-5 py-2 rounded-full text-sm font-bold hover:from-blue-500 hover:to-indigo-500 transition-all shadow-lg">
+                Get Pro - $39.99
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="pt-32 pb-16 px-6 text-center">
+        <div class="max-w-4xl mx-auto">
+            <span
+                class="inline-block px-4 py-1 rounded-full bg-blue-900/30 text-blue-400 text-xs font-bold mb-6 border border-blue-500/30">
+                LAUNCHING ON CHROME WEB STORE SOON
+            </span>
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 text-glow tracking-tight leading-tight">
+                One Prompt.<br><span
+                    class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">Four
+                    Perspectives.</span>
+            </h1>
+            <p class="text-xl text-slate-400 mb-4 max-w-2xl mx-auto leading-relaxed">
+                Stop switching between AI tabs. AI Verdict asks ChatGPT, Claude, Gemini, and Perplexity at the same
+                time, then turns their answers into one clear verdict.
+            </p>
+            <p class="text-emerald-400 font-medium mb-10">
+                No API Keys Required &nbsp;&nbsp;|&nbsp;&nbsp; Uses Your Existing Accounts &nbsp;&nbsp;|&nbsp;&nbsp;
+                One-Time Purchase
+            </p>
+
+            <div class="flex flex-col sm:flex-row justify-center gap-4 mb-4">
+                <span
+                    class="bg-slate-700/60 border border-slate-600 text-slate-400 px-8 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 cursor-not-allowed select-none">
+                    Free — Available at Launch
+                </span>
+                <a href="https://aiverdict.lemonsqueezy.com/checkout/buy/1f2a6fac-df98-4671-b08b-9106aafd8aeb"
+                    target="_blank" rel="noopener" onclick="gtag('event', 'pro_click', { location: 'hero' })"
+                    class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 hover:from-blue-500 hover:to-indigo-500 transition-all shadow-lg hover:shadow-blue-500/50">
+                    Pre-order Pro Lifetime - $39.99
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
+            <p class="text-xs text-slate-500">Purchase now to lock in your license key. Redeem it when the extension
+                launches on the Chrome Web Store.</p>
+        </div>
+    </header>
+
+    <!-- Screenshot Showcase -->
+    <section class="px-6 mb-20">
+        <div class="max-w-7xl mx-auto">
+            <!-- Tab switcher -->
+            <div class="flex items-center justify-center gap-2 mb-6 flex-wrap">
+                <button data-ss="dashboard"
+                    class="ss-tab ss-active px-4 py-2 rounded-full text-sm font-semibold bg-slate-700 text-white border border-slate-600 transition-all">Dashboard</button>
+                <button data-ss="panels"
+                    class="ss-tab px-4 py-2 rounded-full text-sm font-semibold text-slate-400 border border-slate-700/50 hover:border-slate-600 hover:text-white transition-all">Dual
+                    View</button>
+                <button data-ss="verdict"
+                    class="ss-tab px-4 py-2 rounded-full text-sm font-semibold text-slate-400 border border-slate-700/50 hover:border-slate-600 hover:text-white transition-all">The
+                    Verdict</button>
+                <button data-ss="river"
+                    class="ss-tab px-4 py-2 rounded-full text-sm font-semibold text-slate-400 border border-slate-700/50 hover:border-slate-600 hover:text-white transition-all">River
+                    View</button>
+                <button data-ss="light"
+                    class="ss-tab px-4 py-2 rounded-full text-sm font-semibold text-slate-400 border border-slate-700/50 hover:border-slate-600 hover:text-white transition-all">Light
+                    Theme</button>
+                <button data-ss="settings"
+                    class="ss-tab px-4 py-2 rounded-full text-sm font-semibold text-slate-400 border border-slate-700/50 hover:border-slate-600 hover:text-white transition-all">Settings</button>
+            </div>
+            <!-- Screenshot frame -->
+            <div class="relative" id="ss-frame">
+                <div class="absolute -inset-1 bg-gradient-to-r from-blue-500/20 to-indigo-600/20 rounded-3xl blur-lg">
+                </div>
+                <div class="relative bg-slate-900 rounded-2xl overflow-hidden border border-slate-700/80 shadow-2xl">
+                    <div data-ss-panel="dashboard" class="ss-panel ss-visible">
+                        <img src="screenshots/screenshot-dashboard.png"
+                            alt="AI Verdict dashboard showing four AI models answering a health question simultaneously"
+                            class="w-full h-auto block ss-img" loading="eager">
+                        <p class="text-center text-sm text-slate-400 py-3 border-t border-slate-700/50">Four AI models.
+                            One prompt. Responses stream in simultaneously.</p>
+                    </div>
+                    <div data-ss-panel="panels" class="ss-panel">
+                        <img src="screenshots/screenshot-dualview.png"
+                            alt="AI Verdict showing two AI panels side by side with The Verdict Engine below"
+                            class="w-full h-auto block ss-img" loading="lazy">
+                        <p class="text-center text-sm text-slate-400 py-3 border-t border-slate-700/50">Two panels side
+                            by side — compare answers directly, then scroll down for The Verdict.</p>
+                    </div>
+                    <div data-ss-panel="verdict" class="ss-panel">
+                        <img src="screenshots/screenshot-theverdict.png"
+                            alt="The Verdict Engine showing Key Mentions, Common Ground, Insight Gap, and Final Verdict"
+                            class="w-full h-auto block ss-img" loading="lazy">
+                        <p class="text-center text-sm text-slate-400 py-3 border-t border-slate-700/50">The Verdict
+                            Engine — Key Mentions, Common Ground, Insight Gap, and a Final Verdict.</p>
+                    </div>
+                    <div data-ss-panel="river" class="ss-panel">
+                        <img src="screenshots/screenshot-riverview.png"
+                            alt="River layout showing AI responses stacked vertically for deep reading"
+                            class="w-full h-auto block ss-img" loading="lazy">
+                        <p class="text-center text-sm text-slate-400 py-3 border-t border-slate-700/50">River layout —
+                            read responses top to bottom for deeper comparison.</p>
+                    </div>
+                    <div data-ss-panel="light" class="ss-panel">
+                        <img src="screenshots/screenshot-lighttheme.png"
+                            alt="AI Verdict in light mode showing Python vs JavaScript responses with the Verdict Engine"
+                            class="w-full h-auto block ss-img" loading="lazy">
+                        <p class="text-center text-sm text-slate-400 py-3 border-t border-slate-700/50">Light mode —
+                            switch themes any time with the toggle in the top bar.</p>
+                    </div>
+                    <div data-ss-panel="settings" class="ss-panel">
+                        <img src="screenshots/screenshot-settings.png"
+                            alt="AI Verdict settings showing model selection, Verdict Lead, and Custom Summarization Prompt"
+                            class="w-full h-auto block ss-img" loading="lazy">
+                        <p class="text-center text-sm text-slate-400 py-3 border-t border-slate-700/50">Pick your
+                            models, set your Verdict Lead, and customize the synthesis prompt.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it Works -->
+    <section id="how-it-works" class="py-20 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold mb-4">How it Works</h2>
+                <p class="text-slate-400">Three steps from install to insight.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-6 text-center">
+                <div class="glass p-8 rounded-2xl feature-card">
+                    <div
+                        class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4 text-white">
+                        1</div>
+                    <h3 class="font-bold mb-3 text-lg">Zero Setup for Most Models</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">ChatGPT, Gemini, and Perplexity work right away
+                        with no login needed. To use Claude or save your history, just sign into those accounts in your
+                        browser.</p>
+                </div>
+                <div class="glass p-8 rounded-2xl feature-card">
+                    <div
+                        class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4 text-white">
+                        2</div>
+                    <h3 class="font-bold mb-3 text-lg">Type One Prompt</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Ask your question once in the AI Verdict panel. It
+                        sends your prompt to all active models simultaneously. You watch all responses stream in at the
+                        same time, in one place.</p>
+                </div>
+                <div class="glass p-8 rounded-2xl feature-card">
+                    <div
+                        class="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4 text-white">
+                        3</div>
+                    <h3 class="font-bold mb-3 text-lg">Compare, Spot Differences, Get The Verdict</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">See responses side-by-side and instantly spot
+                        where models agree or contradict each other. Pro users can trigger <strong
+                            class="text-white">The Verdict Engine</strong> for a synthesized consensus that highlights
+                        the most reliable answer.</p>
+                    <p class="text-xs text-slate-500 mt-3">Free tier: ChatGPT and Gemini. Pro: all four models plus The
+                        Verdict Engine.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 px-6 bg-slate-900/40">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold mb-4">Everything You Need to <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">Stop
+                        Guessing</span></h2>
+                <p class="text-slate-400 max-w-2xl mx-auto">Built for people who take their AI research seriously. One
+                    interface, all your models, zero tab-switching.</p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+
+                <div class="glass p-6 rounded-2xl feature-card">
+                    <div class="w-10 h-10 bg-blue-600/20 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-bold mb-2">Up to 4 AIs, 1 Prompt</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Query multiple AI models simultaneously. No
+                        copying, no switching tabs, no repetition.</p>
+                    <p class="text-xs text-slate-500 mt-2">Free: ChatGPT and Gemini &nbsp;·&nbsp; Pro: all four</p>
+                </div>
+
+                <div class="glass p-6 rounded-2xl feature-card">
+                    <div class="w-10 h-10 bg-blue-600/20 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-bold mb-2">Real-time Streaming</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Watch your active models generate responses live,
+                        side-by-side as they stream in. No waiting for one to finish before seeing the next.</p>
+                </div>
+
+                <div class="glass p-6 rounded-2xl feature-card border border-indigo-500/20">
+                    <div class="w-10 h-10 bg-indigo-600/20 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3">
+                            </path>
+                        </svg>
+                    </div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <h3 class="font-bold">The Verdict Engine</h3>
+                        <span
+                            class="text-xs bg-indigo-600/30 text-indigo-400 px-2 py-0.5 rounded-full font-bold border border-indigo-500/30">PRO</span>
+                    </div>
+                    <p class="text-sm text-slate-400 leading-relaxed">One AI synthesizes all four responses into a
+                        single consensus, surfacing agreement, disagreement, and the most reliable answer.</p>
+                </div>
+
+                <div class="glass p-6 rounded-2xl feature-card border border-indigo-500/20">
+                    <div class="w-10 h-10 bg-indigo-600/20 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4">
+                            </path>
+                        </svg>
+                    </div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <h3 class="font-bold">Choose Your Verdict Lead</h3>
+                        <span
+                            class="text-xs bg-indigo-600/30 text-indigo-400 px-2 py-0.5 rounded-full font-bold border border-indigo-500/30">PRO</span>
+                    </div>
+                    <p class="text-sm text-slate-400 leading-relaxed">Pick which AI generates the verdict. Trust the
+                        model you trust most to deliver the final synthesis.</p>
+                </div>
+
+                <div class="glass p-6 rounded-2xl feature-card border border-indigo-500/20">
+                    <div class="w-10 h-10 bg-indigo-600/20 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
+                            </path>
+                        </svg>
+                    </div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <h3 class="font-bold">Custom Verdict Prompts</h3>
+                        <span
+                            class="text-xs bg-indigo-600/30 text-indigo-400 px-2 py-0.5 rounded-full font-bold border border-indigo-500/30">PRO</span>
+                    </div>
+                    <p class="text-sm text-slate-400 leading-relaxed">Write your own verdict instructions. Ask for a
+                        structured comparison, a pros and cons list, a recommendation, or a devil's advocate view.</p>
+                </div>
+
+                <div class="glass p-6 rounded-2xl feature-card">
+                    <div class="w-10 h-10 bg-blue-600/20 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="font-bold mb-2">No API Keys Ever</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Uses your existing browser sessions. If you
+                        already use these AIs, you are already set up. Zero extra billing from AI providers.</p>
+                </div>
+
+                <div class="glass p-6 rounded-2xl feature-card">
+                    <div class="w-10 h-10 bg-blue-600/20 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="font-bold mb-2">Dashboard and River Layouts</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Switch between a grid view for scanning all models
+                        at once, or a stacked river view for focused, deep reading.</p>
+                </div>
+
+                <div class="glass p-6 rounded-2xl feature-card">
+                    <div class="w-10 h-10 bg-blue-600/20 rounded-xl flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="font-bold mb-2">Multi-turn Conversations</h3>
+                    <p class="text-sm text-slate-400 leading-relaxed">Follow up with your active models in the same
+                        conversation thread. Context is maintained across turns automatically.</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- The Verdict Engine Deep Dive -->
+    <section id="verdict-engine" class="py-24 px-6">
+        <div class="max-w-7xl mx-auto">
+
+            <!-- Header -->
+            <div class="text-center mb-12">
+                <span
+                    class="inline-block px-3 py-1 rounded-full bg-indigo-900/30 text-indigo-400 text-xs font-bold mb-4 border border-indigo-500/30">PRO
+                    FEATURE</span>
+                <h2 class="text-4xl font-bold mb-4">Meet The Verdict Engine</h2>
+                <p class="text-slate-400 max-w-2xl mx-auto">Getting four different answers is useful. Knowing <em
+                        class="text-white not-italic font-semibold">which answer to trust</em> is the hard part. The
+                    Verdict Engine sends all responses to a lead AI you choose and synthesizes a single, reasoned
+                    conclusion.</p>
+            </div>
+
+            <!-- Feature pills -->
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-14">
+                <div class="glass rounded-xl px-5 py-4 flex items-start gap-3">
+                    <svg class="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span class="text-sm text-slate-300">Flags when one AI says something the others do not</span>
+                </div>
+                <div class="glass rounded-xl px-5 py-4 flex items-start gap-3">
+                    <svg class="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span class="text-sm text-slate-300">Choose your lead model - Claude, GPT-4, or Gemini</span>
+                </div>
+                <div class="glass rounded-xl px-5 py-4 flex items-start gap-3">
+                    <svg class="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span class="text-sm text-slate-300">Override the prompt - pros/cons, recommendation, table, or any
+                        format</span>
+                </div>
+                <div class="glass rounded-xl px-5 py-4 flex items-start gap-3">
+                    <svg class="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span class="text-sm text-slate-300">Works for research, health, finance, coding, and any
+                        decision</span>
+                </div>
+            </div>
+
+            <!-- Interactive demo -->
+            <div class="glass rounded-3xl p-6 md:p-10 border border-slate-700/50">
+
+                <!-- Tab bar -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></div>
+                        <span class="text-sm font-bold text-indigo-400 uppercase tracking-wider">Interactive
+                            Example</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1 sm:mt-0">Lead model and prompt are fully customizable per
+                        query</p>
+                    <div class="flex gap-2 bg-slate-800/60 p-1 rounded-xl overflow-x-auto">
+                        <button data-tab="research"
+                            class="verdict-tab active-tab px-4 py-2 rounded-lg text-sm font-semibold transition-all whitespace-nowrap">Health</button>
+                        <button data-tab="tech"
+                            class="verdict-tab px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-400 hover:text-white whitespace-nowrap">Technical</button>
+                        <button data-tab="lifestyle"
+                            class="verdict-tab px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-400 hover:text-white whitespace-nowrap">Lifestyle</button>
+                        <button data-tab="finance"
+                            class="verdict-tab px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-400 hover:text-white whitespace-nowrap">Finance</button>
+                        <button data-tab="career"
+                            class="verdict-tab px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-400 hover:text-white whitespace-nowrap">Career</button>
+                    </div>
+                </div>
+
+                <!-- Panel: Health / Research -->
+                <div data-panel="research">
+                    <p class="text-xs text-slate-500 mb-5 font-mono">Prompt: "What are the long-term health effects of
+                        intermittent fasting?"</p>
+
+                    <div class="grid sm:grid-cols-2 gap-3 mb-6">
+                        <div class="bg-slate-800/60 rounded-xl p-4 border border-slate-700">
+                            <span
+                                class="inline-block text-xs font-bold px-2 py-0.5 rounded-full bg-green-900/40 text-green-400 border border-green-500/30 mb-3">ChatGPT</span>
+                            <p class="text-xs text-slate-400 leading-relaxed max-h-36 overflow-y-auto ai-scroll pr-1">
+                                Intermittent fasting (IF) can have both benefits and downsides long term, depending on the person, fasting style, diet quality, sleep, stress, and existing health conditions.<br><br>
+                                Common forms: 16:8, 5:2, and alternate-day fasting.<br><br>
+                                <strong class="text-slate-300">Potential long-term benefits</strong><br>
+                                • <strong class="text-slate-300">Weight management</strong> — Many naturally eat fewer calories and lose body fat.<br>
+                                • <strong class="text-slate-300">Improved insulin sensitivity</strong> — May lower risk factors linked to Type 2 Diabetes, especially in overweight individuals.<br>
+                                • <strong class="text-slate-300">Heart health markers</strong> — Improvements in blood pressure, triglycerides, LDL cholesterol, and inflammation.<br>
+                                • <strong class="text-slate-300">Cellular repair</strong> — Fasting may trigger autophagy. Promising in animal studies; human evidence still limited.<br>
+                                • <strong class="text-slate-300">Brain health</strong> — Early research suggests benefits for focus, brain metabolic health, and reduced neurodegenerative risk.<br><br>
+                                <strong class="text-slate-300">Possible downsides</strong><br>
+                                • Fatigue, irritability, difficulty concentrating during adaptation<br>
+                                • Overeating during eating windows; social or lifestyle stress<br>
+                                • Poor nutrient intake if meals are unbalanced<br>
+                                • Loss of muscle mass without adequate protein and resistance training<br>
+                                • May worsen disordered eating, hormonal balance, sleep, or cortisol<br>
+                                • Some women report menstrual irregularities with aggressive fasting<br><br>
+                                <strong class="text-slate-300">What matters most</strong><br>
+                                Total calorie intake, food quality, protein intake, exercise, sleep, and sustainability — not when you eat.<br><br>
+                                <strong class="text-slate-300">Who should be careful</strong><br>
+                                Type 1 Diabetes, eating disorder history, pregnancy or breastfeeding, underweight individuals, certain medications.</p>
+                        </div>
+                        <div class="bg-slate-800/60 rounded-xl p-4 border border-slate-700">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="inline-block text-xs font-bold px-2 py-0.5 rounded-full bg-orange-900/40 text-orange-400 border border-orange-500/30">Claude</span>
+                                <span class="text-xs text-slate-600 italic">75% more concise</span>
+                            </div>
+                            <p class="text-xs text-slate-400 leading-relaxed max-h-36 overflow-y-auto ai-scroll pr-1">
+                                Intermittent fasting (IF)  has been studied with growing interest, and research points to several potential long-term health effects — both benefits and considerations.<br><br>
+                                <strong class="text-slate-300">Potential Benefits</strong><br>
+                                • <em>Metabolic health:</em> Improves insulin sensitivity, lowers blood sugar, reduces type 2 diabetes risk<br>
+                                • <em>Weight management:</em> Lower body weight and reduced visceral fat linked to lower cardiovascular risk<br>
+                                • <em>Cardiovascular health:</em> Lower LDL cholesterol, triglycerides, blood pressure, and inflammatory markers<br>
+                                • <em>Cellular repair:</em> Autophagy linked to longevity and disease risk reduction; long-term human data still developing<br>
+                                • <em>Brain health:</em> May support cognitive function, reduce neuroinflammation, and potentially lower Alzheimer's risk — animal studies promising<br>
+                                • <em>Longevity:</em> Longer lifespan in animal models; early human data suggestive, not conclusive<br><br>
+                                <strong class="text-slate-300">Things to Watch</strong><br>
+                                • Muscle loss without adequate protein and resistance exercise, especially in older adults<br>
+                                • Bone density concerns with long-term restrictive eating<br>
+                                • Hormonal disruption in some women with aggressive fasting<br>
+                                • Nutrient deficiencies with too-narrow eating windows<br>
+                                • Not appropriate for those with eating disorder history<br><br>
+                                <strong class="text-slate-300">The Bottom Line</strong><br>
+                                Research is promising but long-term human studies are still limited. Effects vary by IF type, diet quality, age, sex, and individual health status.</p>
+                        </div>
+                        <div class="bg-slate-800/60 rounded-xl p-4 border border-slate-700">
+                            <span
+                                class="inline-block text-xs font-bold px-2 py-0.5 rounded-full bg-blue-900/40 text-blue-400 border border-blue-500/30 mb-3">Gemini</span>
+                            <p class="text-xs text-slate-400 leading-relaxed max-h-36 overflow-y-auto ai-scroll pr-1">
+                                Research into long-term intermittent fasting IF effects is evolving. Short-term benefits are well-documented; multi-year outcomes are more complex and sometimes contradictory.<br><br>
+                                <strong class="text-slate-300">Potential Long-Term Benefits</strong><br>
+                                • <em>Metabolic Flexibility:</em> Body switches more efficiently between burning glucose and fat, improving energy and metabolic health over time<br>
+                                • <em>Cellular Repair (Autophagy):</em> Hypothesized to reduce neurodegenerative disease risk and slow aging processes<br>
+                                • <em>Cardiovascular Health:</em> Lower resting heart rates and reduced blood pressure in some cohorts; potentially lower lifetime heart disease risk<br>
+                                • <em>Blood Sugar Management:</em> Helps maintain stable HbA1c levels, critical for preventing or managing Type 2 diabetes<br><br>
+                                <strong class="text-slate-300">Long-Term Risks</strong><br>
+                                • <em>Cardiovascular Mortality:</em> Very restrictive eating windows (≤8h/day) associated with higher cardiovascular death risk vs standard 12–16h windows, particularly in older adults<br>
+                                • <em>Muscle Mass Loss:</em> Without adequate protein and resistance training, risk of sarcopenia and frailty increases<br>
+                                • <em>Nutritional Deficiencies:</em> Difficult to get sufficient vitamins, minerals, and fiber — may lead to bone density loss over years<br>
+                                • <em>Hormonal Impact:</em> May disrupt reproductive hormones; lower testosterone in men or irregular cycles in women<br><br>
+                                <strong class="text-slate-300">Expert Perspective</strong><br>
+                                Major recent reviews conclude IF does not significantly outperform traditional calorie-controlled dieting for long-term weight maintenance in the general population.</p>
+                        </div>
+                        <div class="bg-slate-800/60 rounded-xl p-4 border border-slate-700">
+                            <span
+                                class="inline-block text-xs font-bold px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-400 border border-teal-500/30 mb-3">Perplexity</span>
+                            <p class="text-xs text-slate-400 leading-relaxed max-h-36 overflow-y-auto ai-scroll pr-1">
+                                Intermittent fasting (IF) shows mixed long-term effects — benefits like weight loss and improved cardiometabolic markers, but concerns around cardiovascular risks and lean mass loss. Most human data comes from trials lasting 6+ months in overweight adults; evidence beyond one year remains limited.<br><br>
+                                <strong class="text-slate-300">Key Benefits</strong><br>
+                                Reduces body weight ~2.8 kg, BMI 1.4 kg/m², fat mass 3 kg, waist circumference 3.9 cm, fasting glucose 0.14 mmol/L, triglycerides 0.12 mmol/L, and diastolic BP 2.2 mmHg vs usual diets. Slightly edges continuous calorie restriction in fat mass loss (−0.7 kg) and HDL increases (+0.03 mmol/L).<br><br>
+                                <strong class="text-slate-300">Potential Risks</strong><br>
+                                • Analysis of 20,000+ US adults linked &lt;8-hour eating windows to <strong class="text-slate-200">91% higher cardiovascular death risk</strong> vs 12–16h — especially with heart disease or cancer<br>
+                                • Long-term IF may cause lean mass loss (−0.8 kg), raising sarcopenia concerns<br>
+                                • Rodent data shows heart fibrosis after prolonged alternate-day fasting<br>
+                                • No superiority over continuous calorie restriction for cardiometabolic gains<br><br>
+                                <strong class="text-slate-300">Bottom Line</strong><br>
+                                IF works mainly via calorie reduction, not unique timing effects. Consult a doctor before starting, especially with heart issues or medications.<br><br>
+                                <span class="text-slate-600">· 14 sources cited</span></p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="flex-1 h-px bg-slate-700"></div>
+                        <div
+                            class="flex items-center gap-2 px-4 py-1.5 bg-indigo-900/30 rounded-full border border-indigo-500/30">
+                            <svg class="w-3 h-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                            <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">The Verdict
+                                Engine</span>
+                            <svg class="w-3 h-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                        <div class="flex-1 h-px bg-slate-700"></div>
+                    </div>
+
+                    <div class="bg-indigo-950/40 rounded-2xl p-6 border border-indigo-500/30">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse"></div>
+                                <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">The
+                                    Verdict</span>
+                            </div>
+                            <span
+                                class="text-xs px-2 py-0.5 rounded-full bg-orange-900/40 text-orange-400 border border-orange-500/30 font-semibold">Lead:
+                                Claude</span>
+                        </div>
+                        <details class="mb-4 group">
+                            <summary
+                                class="text-xs text-slate-500 cursor-pointer hover:text-slate-400 transition-colors flex items-center gap-1">
+                                <svg class="w-3 h-3 transition-transform group-open:rotate-90 shrink-0" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5l7 7-7 7"></path>
+                                </svg>
+                                View prompt used
+                            </summary>
+                            <div
+                                class="mt-2 text-xs text-slate-500 bg-slate-800/50 rounded-lg px-3 py-2 leading-relaxed border border-slate-700/50 space-y-1">
+                                <p class="italic">You are an expert at finding common ground. Your goal is to combine
+                                    multiple AI answers into one clear, single "Verdict".</p>
+                                <p>Current User Query: <span class="text-slate-400">"What are the long-term health
+                                        effects of intermittent fasting?"</span></p>
+                                <p class="text-slate-600">[AI responses — collected automatically, one per model]</p>
+                                <p>Task:</p>
+                                <p>1. <span class="font-medium text-slate-400">Common Ground</span>: Briefly list what
+                                    all models agree on.</p>
+                                <p>2. <span class="font-medium text-slate-400">The Insight Gap</span>: Highlight unique
+                                    points or different views from individual models.</p>
+                                <p>3. <span class="font-medium text-slate-400">The Final Verdict</span>: Provide a
+                                    balanced summary that includes the best parts of every answer. Focus on being
+                                    accurate and clear, and mention any main differences between the models.</p>
+                                <p class="pt-1">Format using clean markdown with H3 headers (###).</p>
+                            </div>
+                        </details>
+                        <div class="mb-5">
+                            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mb-2">
+                                <span class="text-xs text-slate-500 font-medium">Key mentions</span>
+                                <span class="flex items-center gap-1 text-xs text-slate-600"><span
+                                        class="inline-block w-2 h-2 rounded-full bg-purple-500 shrink-0"></span>all
+                                    models</span>
+                                <span class="flex items-center gap-1 text-xs text-slate-600"><span
+                                        class="inline-block w-2 h-2 rounded-full bg-teal-500 shrink-0"></span>multiple
+                                    models</span>
+                            </div>
+                            <div class="flex flex-wrap gap-1.5">
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-purple-900/40 text-purple-300 border border-purple-500/30 font-medium">TERM
+                                    <span class="opacity-50 font-normal">25</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-purple-900/40 text-purple-300 border border-purple-500/30 font-medium">FASTING
+                                    <span class="opacity-50 font-normal">24</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-purple-900/40 text-purple-300 border border-purple-500/30 font-medium">LONG
+                                    <span class="opacity-50 font-normal">22</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-purple-900/40 text-purple-300 border border-purple-500/30 font-medium">LOSS
+                                    <span class="opacity-50 font-normal">15</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-purple-900/40 text-purple-300 border border-purple-500/30 font-medium">INTERMITTENT
+                                    FASTING <span class="opacity-50 font-normal">11</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">EATING
+                                    <span class="opacity-50 font-normal">15</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">HEALTH
+                                    <span class="opacity-50 font-normal">14</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">RISK
+                                    <span class="opacity-50 font-normal">13</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">WEIGHT
+                                    <span class="opacity-50 font-normal">9</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">MASS
+                                    <span class="opacity-50 font-normal">8</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">BENEFITS
+                                    <span class="opacity-50 font-normal">9</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">WEIGHT
+                                    LOSS <span class="opacity-50 font-normal">5</span></span>
+                            </div>
+                        </div>
+                        <div class="space-y-3 text-sm">
+                            <div>
+                                <p class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">Common
+                                    Ground</p>
+                                <p class="text-slate-300 leading-relaxed">All four models agree:<br>
+                                    • IF can support <strong>weight loss and fat reduction</strong>, though it performs similarly to standard calorie restriction when calories are matched<br>
+                                    • IF improves <strong>insulin sensitivity, blood sugar, triglycerides, blood pressure, and LDL cholesterol</strong> over time<br>
+                                    • <strong>Autophagy</strong> (cellular repair) is a promising mechanism, but long-term human evidence is still limited<br>
+                                    • <strong>Muscle loss</strong> is a real risk without adequate protein and resistance training<br>
+                                    • <strong>Hormonal disruption</strong> (especially in women), <strong>nutrient deficiencies</strong>, and <strong>disordered eating</strong> are legitimate concerns<br>
+                                    • IF is not suitable for everyone — pregnant individuals, Type 1 diabetes, eating disorder histories<br>
+                                    • Long-term human data beyond one year remains sparse</p>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-1">The Insight
+                                    Gap</p>
+                                <p class="text-slate-300 leading-relaxed"><strong>Perplexity</strong> stands out by citing a specific, quantified finding: a large observational study (20,000+ US adults) linking eating windows under 8 hours to a <strong>91% higher cardiovascular death risk</strong>. It also provides concrete numbers (e.g., ~2.8 kg average weight loss, −0.8 kg lean mass) that the other models leave vague.<br><br>
+                                    <strong>Gemini</strong> echoes the cardiovascular mortality concern and adds that the risk applies especially to older adults — a useful nuance. It also explicitly notes the risk of <strong>bone density loss</strong> from long-term restriction, which only Claude also mentions.<br><br>
+                                    <strong>ChatGPT</strong> is the most practical and lifestyle-oriented, emphasizing <strong>social stress, sustainability, and the importance of eating quality over eating timing</strong> as the dominant factor. It's the most accessible but least specific on risks.<br><br>
+                                    <strong>Claude</strong> is the most measured scientifically, noting that <strong>longevity benefits seen in animal models haven't been confirmed in long-term human trials</strong>, and flagging neuroinflammation and Alzheimer's risk reduction as areas of early-stage promise.</p>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-1">The Final
+                                    Verdict</p>
+                                <p class="text-slate-300 leading-relaxed">Intermittent fasting has a genuinely promising — but still incomplete — long-term health profile.<br><br>
+                                    <strong>Likely benefits with consistent practice:</strong><br>
+                                    Modest improvements in body weight, visceral fat, insulin sensitivity, blood pressure, and cardiovascular risk markers. These effects are real, but roughly equivalent to what a well-structured calorie-controlled diet achieves. IF is a method, not a metabolic miracle.<br><br>
+                                    <strong>Promising but not yet proven in humans:</strong><br>
+                                    Autophagy-driven cellular repair, protection against neurodegenerative disease, and longevity effects are exciting areas of research — strongly supported in animal models, but without definitive long-term human confirmation yet.<br><br>
+                                    <strong>Genuine risks that deserve attention:</strong><br>
+                                    The most important caveat, flagged by Perplexity and Gemini, is a large observational study linking very narrow eating windows (under 8 hours) to significantly elevated cardiovascular death risk — particularly in older adults or those with existing heart disease. This doesn't mean IF is dangerous for everyone, but <strong>more aggressive protocols may carry risk that moderate ones don't</strong>. Muscle loss, bone density reduction, hormonal disruption, and nutritional gaps are additional real concerns, especially without thoughtful meal planning.<br><br>
+                                    <strong>The practical takeaway:</strong><br>
+                                    For most healthy adults, a moderate IF approach (12:14 or 16:8 with adequate protein and whole foods) can be a sustainable and beneficial eating structure. Stricter protocols warrant more caution, especially with age or existing health conditions. Food quality, total nutrition, exercise, and sleep remain more influential than meal timing alone. Anyone with a complex health history should consult a physician before committing long-term.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel: Technical -->
+                <div data-panel="tech" class="hidden">
+                    <p class="text-xs text-slate-500 mb-5 font-mono">Prompt: "Should I learn Python or JavaScript as my
+                        first programming language?"</p>
+
+                    <div class="grid sm:grid-cols-2 gap-3 mb-6">
+                        <div class="bg-slate-800/60 rounded-xl p-4 border border-slate-700">
+                            <span
+                                class="inline-block text-xs font-bold px-2 py-0.5 rounded-full bg-green-900/40 text-green-400 border border-green-500/30 mb-3">ChatGPT</span>
+                            <p class="text-xs text-slate-400 leading-relaxed max-h-36 overflow-y-auto ai-scroll pr-1">
+                                If you're undecided, Python is usually the better first language for most
+                                people.<br><br><strong class="text-slate-300">Why Python is a great first
+                                    choice</strong><br>• Cleaner and easier-to-read syntax<br>• Less boilerplate and
+                                weird edge cases<br>• Lets you focus on programming concepts instead of language
+                                quirks<br>• Very versatile: AI / machine learning, automation, scripting, data
+                                analysis, backend development<br><br>Simple example:<br><code>name = input("Your name:
+                                    ")<br>print("Hello", name)</code><br><br><strong class="text-slate-300">Why
+                                    JavaScript is also a strong choice</strong><br>Choose JavaScript first if your main
+                                interest is: websites, web apps, frontend UI, interactive browser projects.<br><br>
+                                JavaScript powers the web, so you can immediately see visual results in a
+                                browser.<br><br>Example: <code>document.body.innerHTML =
+                                    "&lt;h1&gt;Hello!&lt;/h1&gt;";</code><br><br>You can also use JavaScript for
+                                backend development with Node.js, so one language can cover full-stack
+                                development.<br><br><strong class="text-slate-300">Ease of learning</strong><br>Most
+                                beginners find Python easier and less frustrating. JavaScript is powerful, but it
+                                has:<br>• more historical quirks<br>• more confusing behaviour early on<br>• a
+                                faster-moving ecosystem<br><br><strong class="text-slate-300">Job
+                                    opportunities</strong><br>Both are excellent career choices.<br>• Python is booming
+                                because of AI and automation.<br>• JavaScript remains one of the most demanded
+                                languages because nearly every modern website uses it.<br>You won't "lock yourself out"
+                                by choosing either.<br><br><strong class="text-slate-300">Recommended path</strong><br>•
+                                Want the smoothest introduction to programming → Python<br>• Want to build websites/apps
+                                quickly → JavaScript<br><br>The important thing is sticking with one long enough to
+                                build projects. Once you understand programming fundamentals, learning the second
+                                language becomes much easier.</p>
+                        </div>
+                        <div class="bg-slate-800/60 rounded-xl p-4 border border-slate-700">
+                            <div class="flex items-center justify-between mb-3">
+                                <span
+                                    class="inline-block text-xs font-bold px-2 py-0.5 rounded-full bg-orange-900/40 text-orange-400 border border-orange-500/30">Claude</span>
+                                <span class="text-xs text-slate-600 italic">40% shorter</span>
+                            </div>
+                            <p class="text-xs text-slate-400 leading-relaxed max-h-36 overflow-y-auto ai-scroll pr-1">
+                                Both are great choices! Here's a quick rundown to help you
+                                decide:<br><br><strong class="text-slate-300">Choose Python if you...</strong><br>•
+                                Want cleaner, more readable syntax that feels closer to plain English<br>• Are
+                                interested in data science, AI/ML, automation, or scientific computing<br>• Prefer a
+                                gentler learning curve with fewer symbols and punctuation rules<br>• Plan to do backend
+                                web development, scripting, or academic work<br><br><strong
+                                    class="text-slate-300">Choose JavaScript if you...</strong><br>• Want to see
+                                results in a browser immediately (very motivating for beginners)<br>• Are drawn to web
+                                development (it's the only language that runs natively in browsers)<br>• Want to do
+                                both frontend and backend (Node.js) with one language<br>• Like learning by building
+                                interactive, visual things right away<br><br><strong class="text-slate-300">The honest
+                                    truth:</strong> The fundamentals you learn — variables, loops, functions, logic —
+                                transfer between languages easily. Your first language matters less than just picking
+                                one and sticking with it.<br><br>A rough rule of thumb: if you're excited about
+                                <strong class="text-slate-300">web/apps</strong>, go JavaScript. If you're excited
+                                about <strong class="text-slate-300">data, automation, or AI</strong>, go Python. If
+                                you genuinely have no preference, Python's simplicity makes it slightly more
+                                beginner-friendly for pure learning purposes.<br><br>What kind of projects are you
+                                hoping to build? That might make the choice obvious.</p>
+                        </div>
+                        <div class="bg-slate-800/60 rounded-xl p-4 border border-slate-700">
+                            <span
+                                class="inline-block text-xs font-bold px-2 py-0.5 rounded-full bg-blue-900/40 text-blue-400 border border-blue-500/30 mb-3">Gemini</span>
+                            <p class="text-xs text-slate-400 leading-relaxed max-h-36 overflow-y-auto ai-scroll pr-1">
+                                Choosing between Python and JavaScript is a classic crossroads for new developers. Both
+                                are incredibly popular, but they serve different primary purposes. The best choice
+                                depends on what you want to <strong class="text-slate-300">build</strong>
+                                first.<br><br><strong class="text-slate-300">Python: The "Readability"
+                                    Champion</strong><br>Python's syntax is very close to plain English, allowing you
+                                to focus on programming logic rather than struggling with complex punctuation.<br>•
+                                Best for: Data science, AI, automation, backend web development, scientific
+                                research<br>• Simple syntax, fewer brackets/semicolons, huge library ecosystem<br>•
+                                Cons: Not ideal for mobile apps or high-performance game engines<br><br><strong
+                                    class="text-slate-300">JavaScript: The "Language of the Internet"</strong><br>The
+                                only language that runs natively in web browsers. Essential for interactive, visual
+                                experiences.<br>• Best for: Web development (frontend &amp; backend), interactive
+                                websites, mobile apps<br>• Immediate visual results in browser; full-stack capability
+                                with Node.js<br>• Cons: Messier syntax than Python, some counter-intuitive behaviours
+                                for beginners<br><br><strong class="text-slate-300">Direct Comparison</strong><br>•
+                                Learning Curve: Python (Very Smooth) vs JavaScript (Moderate)<br>• Primary Use: Python
+                                (Data &amp; Scripting) vs JavaScript (Web &amp; Apps)<br>• Syntax Style: Python (Clean
+                                &amp; Minimal) vs JavaScript (Brackets &amp; Boilerplate)<br>• Job Market: Both
+                                High<br><br><strong class="text-slate-300">The Verdict</strong><br>• Choose Python if:
+                                interested in data analysis, AI, or want the easiest start to understand how computers
+                                think.<br>• Choose JavaScript if: want to build websites, see work visually in a
+                                browser, or become a full-stack developer.<br><br>Pro-tip: Once you learn the
+                                fundamentals of one language, switching to a second becomes much easier.</p>
+                        </div>
+                        <div class="bg-slate-800/60 rounded-xl p-4 border border-slate-700">
+                            <span
+                                class="inline-block text-xs font-bold px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-400 border border-teal-500/30 mb-3">Perplexity</span>
+                            <p class="text-xs text-slate-400 leading-relaxed max-h-36 overflow-y-auto ai-scroll pr-1">
+                                For most beginners, <strong class="text-slate-300">Python</strong> is the better first
+                                language because its syntax is simpler and it's easier to read, which helps you focus
+                                on programming concepts rather than language quirks. If your main goal is web
+                                development, especially building interactive websites, then <strong
+                                    class="text-slate-300">JavaScript</strong> is the better first choice because it
+                                powers the browser and is central to front-end work.<br><br><strong
+                                    class="text-slate-300">How to choose</strong><br>• Learn <strong
+                                    class="text-slate-300">Python first</strong> if you want to do automation, data
+                                analysis, AI, scripting, or just get a gentler start.<br>• Learn <strong
+                                    class="text-slate-300">JavaScript first</strong> if you want to build websites, web
+                                apps, or see visual results quickly in a browser.<br>• If you are undecided, start with
+                                Python, then pick up JavaScript after the basics, because the core programming ideas
+                                transfer well.<br><br><strong class="text-slate-300">For your background</strong><br>
+                                Given your web, e-commerce, and API experience, <strong
+                                    class="text-slate-300">JavaScript</strong> may be the more immediately useful first
+                                language for front-end or full-stack web development. If your goal is broader
+                                automation, scripting, or AI-related work, <strong
+                                    class="text-slate-300">Python</strong> is the better starter.<br><br><strong
+                                    class="text-slate-300">My practical recommendation</strong><br>If you want the
+                                shortest path to useful projects in your current field, start with <strong
+                                    class="text-slate-300">JavaScript</strong>. If you want the smoothest learning
+                                curve and the broadest beginner-friendly foundation, start with <strong
+                                    class="text-slate-300">Python</strong>.<br><br>A good rule of thumb: <strong
+                                    class="text-slate-300">websites first = JavaScript, everything else first =
+                                    Python</strong>.<br><br><span class="text-slate-600">· 15 sources cited</span></p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="flex-1 h-px bg-slate-700"></div>
+                        <div
+                            class="flex items-center gap-2 px-4 py-1.5 bg-indigo-900/30 rounded-full border border-indigo-500/30">
+                            <svg class="w-3 h-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                            <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">The Verdict
+                                Engine</span>
+                            <svg class="w-3 h-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                        <div class="flex-1 h-px bg-slate-700"></div>
+                    </div>
+
+                    <div class="bg-indigo-950/40 rounded-2xl p-6 border border-indigo-500/30">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse"></div>
+                                <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">The
+                                    Verdict</span>
+                            </div>
+                            <span
+                                class="text-xs px-2 py-0.5 rounded-full bg-green-900/40 text-green-400 border border-green-500/30 font-semibold">Lead:
+                                ChatGPT</span>
+                        </div>
+                        <details class="mb-4 group">
+                            <summary
+                                class="text-xs text-slate-500 cursor-pointer hover:text-slate-400 transition-colors flex items-center gap-1">
+                                <svg class="w-3 h-3 transition-transform group-open:rotate-90 shrink-0" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5l7 7-7 7"></path>
+                                </svg>
+                                View prompt used
+                            </summary>
+                            <div
+                                class="mt-2 text-xs text-slate-500 bg-slate-800/50 rounded-lg px-3 py-2 leading-relaxed border border-slate-700/50 space-y-1">
+                                <p class="italic">You are an expert at finding common ground. Your goal is to combine
+                                    multiple AI answers into one clear, single "Verdict".</p>
+                                <p>Current User Query: <span class="text-slate-400">"Should I learn Python or JavaScript
+                                        as my first programming language?"</span></p>
+                                <p class="text-slate-600">[AI responses — collected automatically, one per model]</p>
+                                <p>Task:</p>
+                                <p>1. <span class="font-medium text-slate-400">Common Ground</span>: Briefly list what
+                                    all models agree on.</p>
+                                <p>2. <span class="font-medium text-slate-400">The Insight Gap</span>: Highlight unique
+                                    points or different views from individual models.</p>
+                                <p>3. <span class="font-medium text-slate-400">The Final Verdict</span>: Provide a
+                                    balanced summary that includes the best parts of every answer. Focus on being
+                                    accurate and clear, and mention any main differences between the models.</p>
+                                <p class="pt-1">Format using clean markdown with H3 headers (###).</p>
+                            </div>
+                        </details>
+                        <div class="mb-5">
+                            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mb-2">
+                                <span class="text-xs text-slate-500 font-medium">Key mentions</span>
+                                <span class="flex items-center gap-1 text-xs text-slate-600"><span
+                                        class="inline-block w-2 h-2 rounded-full bg-purple-500 shrink-0"></span>all
+                                    models</span>
+                                <span class="flex items-center gap-1 text-xs text-slate-600"><span
+                                        class="inline-block w-2 h-2 rounded-full bg-teal-500 shrink-0"></span>multiple
+                                    models</span>
+                            </div>
+                            <div class="flex flex-wrap gap-1.5">
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-purple-900/40 text-purple-300 border border-purple-500/30 font-medium">JAVASCRIPT
+                                    <span class="opacity-50 font-normal">36</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-purple-900/40 text-purple-300 border border-purple-500/30 font-medium">PYTHON
+                                    <span class="opacity-50 font-normal">34</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-purple-900/40 text-purple-300 border border-purple-500/30 font-medium">LANGUAGE
+                                    <span class="opacity-50 font-normal">18</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">PYTHON
+                                    JAVASCRIPT <span class="opacity-50 font-normal">10</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">LEARNING
+                                    <span class="opacity-50 font-normal">10</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">DATA
+                                    <span class="opacity-50 font-normal">9</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">DEVELOPMENT
+                                    <span class="opacity-50 font-normal">9</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">BROWSER
+                                    <span class="opacity-50 font-normal">8</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">BUILD
+                                    <span class="opacity-50 font-normal">8</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">PROGRAMMING
+                                    <span class="opacity-50 font-normal">8</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">BACKEND
+                                    <span class="opacity-50 font-normal">8</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">WEB
+                                    DEVELOPMENT <span class="opacity-50 font-normal">6</span></span>
+                            </div>
+                        </div>
+                        <details class="mb-5 group">
+                            <summary
+                                class="text-xs text-indigo-400 cursor-pointer hover:text-indigo-300 transition-colors flex items-center gap-1.5 select-none">
+                                <svg class="w-3 h-3 transition-transform group-open:rotate-180 shrink-0" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                                <span class="font-semibold">Concise Response: Claude</span>
+                            </summary>
+                            <p class="mt-1 text-xs text-slate-500 pl-5">Response is 40% shorter than the average —
+                                may contain unique detail.</p>
+                        </details>
+                        <div class="space-y-3 text-sm">
+                            <div>
+                                <p class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">Common
+                                    Ground</p>
+                                <p class="text-slate-300 leading-relaxed">All four models agree on a few key
+                                    points:<br>• <strong>Both Python and JavaScript are excellent first programming
+                                        languages.</strong><br>• The best choice depends mainly on <strong>what you want
+                                        to build</strong>.<br>• <strong>Python is generally easier for
+                                        beginners</strong> because of its cleaner, more readable syntax.<br>•
+                                    <strong>JavaScript is the best entry point for web development</strong> and
+                                    interactive browser-based projects.<br>• The core concepts of programming transfer
+                                    between languages: variables, loops, functions, logic, debugging.<br>• Once you learn
+                                    one language properly, <strong>learning the other becomes much easier</strong>.<br>•
+                                    The most important thing is not choosing the "perfect" language, but <strong>sticking
+                                        with one long enough to build real projects</strong>.<br><br>A shared rule of
+                                    thumb appears across nearly every answer: <strong>Python for
+                                        AI/data/automation/general learning — JavaScript for
+                                        websites/apps/web development</strong>.</p>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-1">The Insight
+                                    Gap</p>
+                                <p class="text-slate-300 leading-relaxed">Each model contributed slightly different
+                                    strengths:<br><br>• <strong>ChatGPT</strong> — Most practical and balanced. Strong
+                                    emphasis on Python being less frustrating for beginners and JavaScript having more
+                                    historical quirks. Highlighted that neither choice hurts long-term career
+                                    prospects.<br><br>• <strong>Gemini</strong> — Best conceptual framing: Python = "readability
+                                    champion," JavaScript = "language of the internet." Added strong ecosystem context
+                                    and included the clearest direct comparison table.<br><br>• <strong>Claude</strong>
+                                    — Most concise and beginner-friendly. Focused on motivation and learning style.
+                                    Delivered one of the strongest overall truths: your first language matters less than
+                                    building consistency and fundamentals.<br><br>• <strong>Perplexity</strong> — Most
+                                    personalised and career-oriented. Added context for someone already interested in
+                                    APIs, e-commerce, and web systems. Reinforced the industry rule: "websites first =
+                                    JavaScript, everything else first = Python."</p>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-1">The Final
+                                    Verdict</p>
+                                <p class="text-slate-300 leading-relaxed">For most complete beginners,
+                                    <strong>Python is usually the better first programming language</strong>.<br><br>
+                                    Why? Because it has cleaner syntax, fewer confusing edge cases, less boilerplate,
+                                    and a gentler learning curve — making it easier to focus on learning how programming
+                                    works rather than fighting the language itself. Python is especially strong for AI
+                                    and machine learning, automation, scripting, data analysis, backend systems, and
+                                    cybersecurity.<br><br>However, if your main goal is specifically to build websites,
+                                    create web apps, work on frontend UI, make interactive browser projects, or become a
+                                    full-stack web developer, then <strong>JavaScript is the better first
+                                        choice</strong>. JavaScript lets you see results immediately in the browser, and
+                                    it remains one of the most in-demand languages because the modern web depends on
+                                    it.<br><br>The clearest combined recommendation from all models:<br>•
+                                    <strong>Undecided beginner → Python</strong><br>• <strong>Web-focused beginner →
+                                        JavaScript</strong><br><br>The bigger lesson is that learning programming
+                                    fundamentals matters far more than picking the "perfect" first language. Pick one
+                                    based on your interests, build small projects consistently, then learn the second
+                                    language later if needed.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel: Lifestyle -->
+                <div data-panel="lifestyle" class="hidden">
+                    <p class="text-xs text-slate-500 mb-5 font-mono">Prompt: "Is it better to rent or buy a home?"</p>
+
+                    <div class="grid sm:grid-cols-2 gap-3 mb-6">
+                        <div class="bg-slate-800/60 rounded-xl p-4 border border-slate-700">
+                            <span
+                                class="inline-block text-xs font-bold px-2 py-0.5 rounded-full bg-green-900/40 text-green-400 border border-green-500/30 mb-3">ChatGPT</span>
+                            <p class="text-xs text-slate-400 leading-relaxed max-h-36 overflow-y-auto ai-scroll pr-1">
+                                Neither is universally "better" — it depends on your finances, lifestyle, and how long
+                                you expect to stay put.<br><br>A simple rule of thumb: <strong
+                                    class="text-slate-300">Renting usually wins short term. Buying usually wins long
+                                    term.</strong><br><br>Many analysts suggest buying only makes strong financial sense
+                                if you'll stay roughly <strong class="text-slate-300">5–7 years or more</strong>,
+                                especially with today's higher mortgage rates and home prices.<br><br><strong
+                                    class="text-slate-300">Renting is usually better if:</strong><br>• You may move
+                                within a few years<br>• You value flexibility<br>• You don't want maintenance
+                                headaches<br>• Rent is much cheaper than mortgage + taxes + maintenance in your
+                                area<br><br>Renting also lets you invest your savings elsewhere instead of locking
+                                everything into a house.<br><br><strong class="text-slate-300">Buying is usually better
+                                    if:</strong><br>• You plan to stay long term<br>• Your job/location is stable<br>•
+                                You can comfortably afford the mortgage<br>• You have emergency savings after the down
+                                payment<br>• You want stability and building equity over time<br><br><strong
+                                    class="text-slate-300">What people often underestimate</strong><br>Buying costs more
+                                than just the mortgage: property tax, insurance, repairs, renovations, interest, legal
+                                fees, agent fees, maintenance.<br><br>Renting costs more than just rent too: annual rent
+                                increases, less housing security, no equity building.<br><br>A lot of people assume
+                                "renting is throwing money away," but mortgage interest, taxes, and maintenance are also
+                                unrecoverable costs.</p>
+                        </div>
+                        <div class="bg-slate-800/60 rounded-xl p-4 border border-slate-700">
+                            <span
+                                class="inline-block text-xs font-bold px-2 py-0.5 rounded-full bg-orange-900/40 text-orange-400 border border-orange-500/30 mb-3">Claude</span>
+                            <p class="text-xs text-slate-400 leading-relaxed max-h-36 overflow-y-auto ai-scroll pr-1">
+                                The rent vs. buy decision depends on your personal situation, but here are the key
+                                factors to consider.<br><br><strong class="text-slate-300">Financial
+                                    considerations</strong><br>Buying builds equity and offers some protection against
+                                rising housing costs, but comes with significant upfront costs (down payment, closing
+                                costs) and ongoing expenses like maintenance, property taxes, and insurance. Renting
+                                requires less capital upfront and has more predictable monthly costs, though you're not
+                                building equity.<br><br>A useful rule of thumb is the <strong
+                                    class="text-slate-300">price-to-rent ratio</strong> — divide the home's purchase
+                                price by annual rent for a comparable place. A ratio above ~20 generally favours
+                                renting; below ~15 tends to favour buying.<br><br><strong
+                                    class="text-slate-300">Lifestyle factors</strong><br>Buying typically makes more
+                                financial sense if you'll be there at least <strong
+                                    class="text-slate-300">5–7 years</strong>, since transaction costs are high and it
+                                takes time to break even. Renting offers more flexibility.<br><br><strong
+                                    class="text-slate-300">The "hidden" costs of buying</strong><br>People often
+                                underestimate maintenance (typically 1–2% of home value per year), HOA fees, property
+                                taxes, and the opportunity cost of tying up a large down payment.<br><br><strong
+                                    class="text-slate-300">The honest answer:</strong> neither is universally better —
+                                it depends on your local market, financial situation, how long you'll stay, and your
+                                personal priorities.</p>
+                        </div>
+                        <div class="bg-slate-800/60 rounded-xl p-4 border border-slate-700">
+                            <span
+                                class="inline-block text-xs font-bold px-2 py-0.5 rounded-full bg-blue-900/40 text-blue-400 border border-blue-500/30 mb-3">Gemini</span>
+                            <p class="text-xs text-slate-400 leading-relaxed max-h-36 overflow-y-auto ai-scroll pr-1">
+                                The choice depends on your financial goals, lifestyle, and how long you plan to stay.
+                                Neither is universally "better."<br><br><strong class="text-slate-300">Quick
+                                    comparison</strong><br>• Upfront Cost: Renting (Low) vs Buying (High — downpayment,
+                                taxes, legal fees)<br>• Flexibility: Renting (High) vs Buying (Low — selling takes time
+                                and effort)<br>• Maintenance: Renting (Landlord's responsibility) vs Buying (Your cost)
+                                <br>• Equity: Renting (None) vs Buying (Builds wealth over time)<br>• Stability:
+                                Renting (Low) vs Buying (High)<br><br><strong class="text-slate-300">When renting makes
+                                    sense</strong><br>• Short-term living (under 3–5 years): avoid heavy transaction
+                                costs<br>• Preserving liquidity for other investments<br>• Career or lifestyle
+                                uncertainty<br>• Avoiding sudden repair costs<br><br><strong
+                                    class="text-slate-300">When buying makes sense</strong><br>• Building long-term
+                                wealth as a "forced savings" vehicle<br>• Stability for dependents and school
+                                enrollment<br>• Creative control — renovate as you wish<br>• Fixed-rate mortgage
+                                protects against unpredictable rent hikes<br><br><strong class="text-slate-300">The
+                                    "5-Year Rule"</strong><br>If you don't see yourself staying for at least 5 years,
+                                you should likely rent. The costs of buying often take a few years of price appreciation
+                                to "break even."<br><br><strong class="text-slate-300">Financial nuance:</strong> In
+                                some high-priced markets, it can be more profitable to rent cheaply and invest the
+                                difference in the stock market — but this requires high discipline.</p>
+                        </div>
+                        <div class="bg-slate-800/60 rounded-xl p-4 border border-slate-700">
+                            <span
+                                class="inline-block text-xs font-bold px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-400 border border-teal-500/30 mb-3">Perplexity</span>
+                            <p class="text-xs text-slate-400 leading-relaxed max-h-36 overflow-y-auto ai-scroll pr-1">
+                                It depends on your time horizon, cash cushion, and how likely you are to stay in one
+                                place. In general, <strong class="text-slate-300">buying</strong> tends to win if you
+                                can afford the upfront costs and expect to stay long enough to offset transaction costs,
+                                while <strong class="text-slate-300">renting</strong> is usually better if you value
+                                flexibility or may move within a few years.<br><br><strong
+                                    class="text-slate-300">When buying makes sense</strong><br>Buying is usually the
+                                stronger choice if you have stable income, enough savings for the down payment and
+                                closing costs, and a plan to stay put for several years. It can build equity, offer more
+                                stability, and protect you from rent increases — but you also take on maintenance,
+                                insurance, taxes, and market risk.<br><br><strong class="text-slate-300">When renting
+                                    makes sense</strong><br>Renting is often better if you want lower upfront costs,
+                                easier relocation, and less responsibility for repairs. It also preserves liquidity,
+                                which can matter if you want to keep cash available for investing or
+                                emergencies.<br><br><strong class="text-slate-300">Practical rule</strong><br>If you
+                                might move soon, rent. If you're settled and can comfortably carry the full cost of
+                                ownership, buy. The breakeven point can range widely depending on local prices, rents,
+                                and expected appreciation.<br><br><strong class="text-slate-300">For
+                                    Singapore</strong><br>The same broad logic applies, but the decision also depends
+                                heavily on whether you're considering HDB or private property, and whether you qualify
+                                for ownership options.<br><br><span class="text-slate-600">· 15 sources cited</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="flex-1 h-px bg-slate-700"></div>
+                        <div
+                            class="flex items-center gap-2 px-4 py-1.5 bg-indigo-900/30 rounded-full border border-indigo-500/30">
+                            <svg class="w-3 h-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                            <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">The Verdict
+                                Engine</span>
+                            <svg class="w-3 h-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                        <div class="flex-1 h-px bg-slate-700"></div>
+                    </div>
+
+                    <div class="bg-indigo-950/40 rounded-2xl p-6 border border-indigo-500/30">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse"></div>
+                                <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">The
+                                    Verdict</span>
+                            </div>
+                            <span
+                                class="text-xs px-2 py-0.5 rounded-full bg-blue-900/40 text-blue-400 border border-blue-500/30 font-semibold">Lead:
+                                Gemini</span>
+                        </div>
+                        <details class="mb-4 group">
+                            <summary
+                                class="text-xs text-slate-500 cursor-pointer hover:text-slate-400 transition-colors flex items-center gap-1">
+                                <svg class="w-3 h-3 transition-transform group-open:rotate-90 shrink-0" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5l7 7-7 7"></path>
+                                </svg>
+                                View prompt used
+                            </summary>
+                            <div
+                                class="mt-2 text-xs text-slate-500 bg-slate-800/50 rounded-lg px-3 py-2 leading-relaxed border border-slate-700/50 space-y-1">
+                                <p class="italic">You are an expert at finding common ground. Your goal is to combine
+                                    multiple AI answers into one clear, single "Verdict".</p>
+                                <p>Current User Query: <span class="text-slate-400">"Is it better to rent or buy a
+                                        home?"</span></p>
+                                <p class="text-slate-600">[AI responses — collected automatically, one per model]</p>
+                                <p>Task:</p>
+                                <p>1. <span class="font-medium text-slate-400">Common Ground</span>: Briefly list what
+                                    all models agree on.</p>
+                                <p>2. <span class="font-medium text-slate-400">The Insight Gap</span>: Highlight unique
+                                    points or different views from individual models.</p>
+                                <p>3. <span class="font-medium text-slate-400">The Final Verdict</span>: Provide a
+                                    balanced summary that includes the best parts of every answer. Focus on being
+                                    accurate and clear, and mention any main differences between the models.</p>
+                                <p class="pt-1">Format using clean markdown with H3 headers (###).</p>
+                            </div>
+                        </details>
+                        <div class="mb-5">
+                            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mb-2">
+                                <span class="text-xs text-slate-500 font-medium">Key mentions</span>
+                                <span class="flex items-center gap-1 text-xs text-slate-600"><span
+                                        class="inline-block w-2 h-2 rounded-full bg-purple-500 shrink-0"></span>all
+                                    models</span>
+                                <span class="flex items-center gap-1 text-xs text-slate-600"><span
+                                        class="inline-block w-2 h-2 rounded-full bg-teal-500 shrink-0"></span>multiple
+                                    models</span>
+                            </div>
+                            <div class="flex flex-wrap gap-1.5">
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-purple-900/40 text-purple-300 border border-purple-500/30 font-medium">BUYING
+                                    <span class="opacity-50 font-normal">30</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-purple-900/40 text-purple-300 border border-purple-500/30 font-medium">RENTING
+                                    <span class="opacity-50 font-normal">28</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-purple-900/40 text-purple-300 border border-purple-500/30 font-medium">RENT
+                                    <span class="opacity-50 font-normal">27</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-purple-900/40 text-purple-300 border border-purple-500/30 font-medium">COSTS
+                                    <span class="opacity-50 font-normal">20</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-purple-900/40 text-purple-300 border border-purple-500/30 font-medium">HOME
+                                    <span class="opacity-50 font-normal">17</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">LONG
+                                    <span class="opacity-50 font-normal">13</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">STAY
+                                    <span class="opacity-50 font-normal">13</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">MORTGAGE
+                                    <span class="opacity-50 font-normal">13</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">YEARS
+                                    <span class="opacity-50 font-normal">11</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">PROPERTY
+                                    <span class="opacity-50 font-normal">11</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">BETTER
+                                    <span class="opacity-50 font-normal">9</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">MAINTENANCE
+                                    <span class="opacity-50 font-normal">9</span></span>
+                            </div>
+                        </div>
+                        <div class="space-y-3 text-sm">
+                            <p class="text-slate-400 leading-relaxed text-xs">As of mid-2026, the debate between
+                                renting and buying has shifted due to stabilizing interest rates and a surge in housing
+                                supply. While all models agree that the decision is highly personal, here is the
+                                synthesized verdict based on the latest market conditions.</p>
+                            <div>
+                                <p class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">Common
+                                    Ground</p>
+                                <p class="text-slate-300 leading-relaxed">All models and current data agree on several
+                                    fundamental principles:<br>• <strong>The Time Horizon is Decisive:</strong> Buying
+                                    is almost universally considered a poor financial move for stays under <strong
+                                        class="text-indigo-400">3 years</strong> due to high transaction costs.<br>•
+                                    <strong>Hidden Costs of Ownership:</strong> Beyond the mortgage, buyers must account
+                                    for "unrecoverable costs" like property taxes, insurance, and maintenance (typically
+                                    <strong class="text-indigo-400">1–2%</strong> of the home's value annually).<br>•
+                                    <strong>Forced Savings vs. Opportunity Cost:</strong> Buying acts as a "forced
+                                    savings" vehicle through equity, but renting allows for greater
+                                    <strong>liquidity</strong> — the ability to invest cash elsewhere instead of locking
+                                    it into a down payment.<br>• <strong>Psychological Factors:</strong> Buying offers
+                                    stability and creative control (renovations), while renting offers flexibility and
+                                    freedom from maintenance "headaches."</p>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-1">The Insight
+                                    Gap</p>
+                                <p class="text-slate-300 leading-relaxed">While the core logic is consistent, specific
+                                    models offer unique tactical perspectives:<br><br>• <strong>The "5% Rule" &amp;
+                                        Price-to-Rent Ratio:</strong> Claude and recent financial commentary emphasize
+                                    mathematical shortcuts. If the annual rent is less than 5% of the home's value,
+                                    renting is likely the winner. A <strong>price-to-rent ratio above 20</strong>
+                                    heavily favours renting.<br><br>• <strong>The 2026 "Supply Surge":</strong>
+                                    Perplexity notes that in regions like Singapore and parts of the US, a massive
+                                    influx of new housing completions in 2026 is beginning to shift the power back to
+                                    buyers, potentially moderating prices.<br><br>• <strong>The Psychological Tipping
+                                        Point:</strong> Modern financial research suggests that mortgage rates above
+                                    <strong>5.5%</strong> act as a major psychological barrier. Even if buying is
+                                    mathematically viable, many are choosing to rent in 2026 to wait for further rate
+                                    cuts or better inventory.</p>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-1">The Final
+                                    Verdict</p>
+                                <p class="text-slate-300 leading-relaxed">In 2026, the "better" choice is defined by
+                                    your <strong>Breakeven Horizon</strong>. Because mortgage rates have settled near 6%
+                                    and home prices remain elevated, the breakeven point has extended to roughly
+                                    <strong>5–7 years</strong>.<br><br></p>
+                                <div
+                                    class="grid grid-cols-2 gap-px bg-slate-700 rounded-lg overflow-hidden text-xs mb-3">
+                                    <div class="bg-slate-800/80 px-3 py-2 font-semibold text-teal-400">Choose Renting
+                                        If...</div>
+                                    <div class="bg-slate-800/80 px-3 py-2 font-semibold text-indigo-400">Choose Buying
+                                        If...</div>
+                                    <div class="bg-slate-800/60 px-3 py-2 text-slate-400">Your lifestyle or job
+                                        requires flexibility within the next 5 years.</div>
+                                    <div class="bg-slate-800/60 px-3 py-2 text-slate-400">You are ready to "stay put"
+                                        for at least 7 years to offset closing costs.</div>
+                                    <div class="bg-slate-800/60 px-3 py-2 text-slate-400">You want to keep your capital
+                                        liquid for high-growth investments.</div>
+                                    <div class="bg-slate-800/60 px-3 py-2 text-slate-400">You want a "forced savings"
+                                        plan and a hedge against long-term inflation.</div>
+                                    <div class="bg-slate-800/60 px-3 py-2 text-slate-400">You live in a "hot" market
+                                        where the price-to-rent ratio exceeds 20.</div>
+                                    <div class="bg-slate-800/60 px-3 py-2 text-slate-400">You value the social and
+                                        psychological security of a permanent "home base."</div>
+                                    <div class="bg-slate-800/60 px-3 py-2 text-slate-400">You want to avoid the 2026
+                                        spike in maintenance and labor costs.</div>
+                                    <div class="bg-slate-800/60 px-3 py-2 text-slate-400">You can comfortably afford a
+                                        15–20% down payment without draining your emergency fund.</div>
+                                </div>
+                                <p class="text-slate-300 leading-relaxed"><strong>Summary:</strong> For most people in
+                                    the current market, <strong>renting is the smarter financial play for the short
+                                        term</strong>, preserving your cash and flexibility. <strong>Buying wins for the
+                                        long haul</strong>, provided you treat the home as a stable residence first and
+                                    an investment second.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel: Finance -->
+                <div data-panel="finance" class="hidden">
+                    <p class="text-xs text-slate-500 mb-5 font-mono">Prompt: "Should I invest in index funds or pick
+                        individual stocks?"</p>
+
+                    <div class="grid sm:grid-cols-2 gap-3 mb-6">
+                        <div class="bg-slate-800/60 rounded-xl p-4 border border-slate-700">
+                            <span
+                                class="inline-block text-xs font-bold px-2 py-0.5 rounded-full bg-green-900/40 text-green-400 border border-green-500/30 mb-3">ChatGPT</span>
+                            <p class="text-xs text-slate-400 leading-relaxed max-h-36 overflow-y-auto ai-scroll pr-1">
+                                For most people, <strong class="text-slate-300">index funds are the better default
+                                    choice</strong>. They're simpler, lower risk than stock picking, and historically
+                                beat most individual investors over the long run.<br><br><strong
+                                    class="text-slate-300">Why index funds win for most investors</strong><br>Index
+                                funds buy a large basket of companies at once instead of betting on a few names.<br>•
+                                Diversification reduces risk<br>• Very low fees<br>• Less time and stress<br>•
+                                Historically strong long-term returns<br><br>A lot of professional fund managers even
+                                fail to consistently beat index funds after fees. Popular examples: VOO, SPY,
+                                VWRA.<br><br><strong class="text-slate-300">When individual stocks make
+                                    sense</strong><br>Picking stocks can work if you genuinely enjoy researching
+                                companies, understand financial statements/business models, can handle volatility
+                                emotionally, and accept the risk of underperforming the market.<br>• Upside: potentially
+                                higher returns, more engaging, invest in themes you believe in<br>• Downside: higher
+                                risk, easier to make emotional decisions, a few bad picks can hurt returns
+                                badly<br><br><strong class="text-slate-300">A balanced approach</strong><br>Many
+                                investors do both: put <strong class="text-slate-300">80–90%</strong> into index funds,
+                                use <strong class="text-slate-300">10–20%</strong> for individual stocks.<br><br><strong
+                                    class="text-slate-300">Simple rule of thumb</strong><br>• Want solid long-term
+                                results with minimal effort → index funds<br>• Enjoy analysing businesses and okay with
+                                more risk → add some individual stocks</p>
+                        </div>
+                        <div class="bg-slate-800/60 rounded-xl p-4 border border-slate-700">
+                            <span
+                                class="inline-block text-xs font-bold px-2 py-0.5 rounded-full bg-orange-900/40 text-orange-400 border border-orange-500/30 mb-3">Claude</span>
+                            <p class="text-xs text-slate-400 leading-relaxed max-h-36 overflow-y-auto ai-scroll pr-1">
+                                <strong class="text-slate-300">Index Funds</strong><br>Index funds offer broad
+                                diversification across many companies with a single investment, low fees (often under
+                                0.1%), consistent market-rate returns over time, and simplicity — minimal research or
+                                ongoing management required. Decades of data show that the majority of actively managed
+                                funds and individual stock pickers fail to beat the market consistently over the long
+                                run.<br><br><strong class="text-slate-300">Individual Stocks</strong><br>Picking
+                                individual stocks can be appealing — potential to outperform the market, invest in
+                                companies you believe in, and can be intellectually engaging. However: requires
+                                significant time, research, and discipline; individual stocks carry much higher
+                                volatility and risk; emotional decision-making often hurts returns; and transaction
+                                costs or taxes can eat into gains.<br><br><strong class="text-slate-300">What most
+                                    financial research suggests</strong><br>The evidence generally favours index funds
+                                for the majority of people, particularly those who don't have the time, expertise, or
+                                temperament to analyse individual companies deeply. Even many professional fund managers
+                                underperform a simple S&amp;P 500 index fund over a 10–20 year horizon.<br><br><strong
+                                    class="text-slate-300">A middle ground</strong><br>Many people use a "core and
+                                satellite" approach — most of their portfolio in index funds, with a smaller portion
+                                (5–15%) to individual stocks they want to pursue.<br><br>Index funds are a solid,
+                                evidence-backed starting point for most individual investors.</p>
+                        </div>
+                        <div class="bg-slate-800/60 rounded-xl p-4 border border-slate-700">
+                            <span
+                                class="inline-block text-xs font-bold px-2 py-0.5 rounded-full bg-blue-900/40 text-blue-400 border border-blue-500/30 mb-3">Gemini</span>
+                            <p class="text-xs text-slate-400 leading-relaxed max-h-36 overflow-y-auto ai-scroll pr-1">
+                                Choosing between index funds and individual stocks depends on your goals, time
+                                commitment, and risk tolerance.<br><br><strong class="text-slate-300">Index Funds: The
+                                    Passive Approach</strong><br>• Diversification: instantly own a small piece of
+                                hundreds or thousands of companies<br>• Consistency: outperform the majority of active
+                                stock pickers over a 10–20 year horizon<br>• Low Maintenance: automate via DCA and
+                                focus on other things<br>• Cost Effective: very low expense ratios<br><br><strong
+                                    class="text-slate-300">Individual Stocks: The Active Approach</strong><br>•
+                                Potential for Outperformance: identify a "winner" early, returns can exceed a broad
+                                index<br>• Control: total say over where your money goes; avoid industries you dislike
+                                or double down on sectors you understand<br>• Strategic Flexibility: more advanced
+                                strategies like <strong class="text-slate-300">selling covered calls</strong> or
+                                <strong class="text-slate-300">cash-secured puts</strong> to generate extra income<br>•
+                                High Effort: requires significant homework — financial statements, industry news,
+                                intrinsic value calculations<br><br><strong class="text-slate-300">A Hybrid Strategy —
+                                    "Core and Satellite"</strong><br>1. The Core: put 70–90% of capital into low-cost
+                                index funds for steady market growth.<br>2. The Satellite: use the remaining 10–30% to
+                                explore individual stocks or specific sectors (Tech, EVs) where you have particular
+                                insight or interest.</p>
+                        </div>
+                        <div class="bg-slate-800/60 rounded-xl p-4 border border-slate-700">
+                            <span
+                                class="inline-block text-xs font-bold px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-400 border border-teal-500/30 mb-3">Perplexity</span>
+                            <p class="text-xs text-slate-400 leading-relaxed max-h-36 overflow-y-auto ai-scroll pr-1">
+                                For most investors, index funds offer a safer, more reliable path than picking
+                                individual stocks due to built-in diversification and lower
+                                risk.<br><br><strong class="text-slate-300">Key differences</strong><br>Index funds
+                                track broad market indexes like the S&amp;P 500, spreading investments across hundreds
+                                of companies. Individual stocks concentrate risk on one company — higher potential
+                                rewards but greater volatility and the need for deep research.<br>• Risk: Index funds
+                                (lower, diversified) vs Individual stocks (higher, company-specific)<br>• Effort: Index
+                                funds (passive, low maintenance) vs Individual stocks (active research &amp;
+                                monitoring)<br>• Returns: Index funds (~8% annualised long-term) vs Individual stocks
+                                (potential to beat market, but 90%+ underperform)<br>• Costs: Index funds (low fees)
+                                vs Individual stocks (trading fees, potential taxes)<br><br><strong
+                                    class="text-slate-300">Recommendation</strong><br>Start with index funds or
+                                dividend ETFs (e.g., SCHD, VYM) as your core for stability. Allocate 10–20% to
+                                individual stocks or options strategies like CSPs only if you're experienced and treat
+                                it as "fun money." This hybrid "core-satellite" approach balances active trading
+                                interests with proven reliability.<br><br><span class="text-slate-600">· 14 sources
+                                    cited</span></p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="flex-1 h-px bg-slate-700"></div>
+                        <div
+                            class="flex items-center gap-2 px-4 py-1.5 bg-indigo-900/30 rounded-full border border-indigo-500/30">
+                            <svg class="w-3 h-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                            <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">The Verdict
+                                Engine</span>
+                            <svg class="w-3 h-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                        <div class="flex-1 h-px bg-slate-700"></div>
+                    </div>
+
+                    <div class="bg-indigo-950/40 rounded-2xl p-6 border border-indigo-500/30">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse"></div>
+                                <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">The
+                                    Verdict</span>
+                            </div>
+                            <span
+                                class="text-xs px-2 py-0.5 rounded-full bg-orange-900/40 text-orange-400 border border-orange-500/30 font-semibold">Lead:
+                                Claude</span>
+                        </div>
+                        <details class="mb-4 group">
+                            <summary
+                                class="text-xs text-slate-500 cursor-pointer hover:text-slate-400 transition-colors flex items-center gap-1">
+                                <svg class="w-3 h-3 transition-transform group-open:rotate-90 shrink-0" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5l7 7-7 7"></path>
+                                </svg>
+                                View prompt used
+                            </summary>
+                            <div
+                                class="mt-2 text-xs text-slate-500 bg-slate-800/50 rounded-lg px-3 py-2 leading-relaxed border border-slate-700/50 space-y-1">
+                                <p class="italic">You are an expert at finding common ground. Your goal is to combine
+                                    multiple AI answers into one clear, single "Verdict".</p>
+                                <p>Current User Query: <span class="text-slate-400">"Should I invest in index funds or
+                                        pick individual stocks?"</span></p>
+                                <p class="text-slate-600">[AI responses — collected automatically, one per model]</p>
+                                <p>Task:</p>
+                                <p>1. <span class="font-medium text-slate-400">Common Ground</span>: Briefly list what
+                                    all models agree on.</p>
+                                <p>2. <span class="font-medium text-slate-400">The Insight Gap</span>: Highlight unique
+                                    points or different views from individual models.</p>
+                                <p>3. <span class="font-medium text-slate-400">The Final Verdict</span>: Provide a
+                                    balanced summary that includes the best parts of every answer. Focus on being
+                                    accurate and clear, and mention any main differences between the models.</p>
+                                <p class="pt-1">Format using clean markdown with H3 headers (###).</p>
+                            </div>
+                        </details>
+                        <div class="mb-5">
+                            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mb-2">
+                                <span class="text-xs text-slate-500 font-medium">Key mentions</span>
+                                <span class="flex items-center gap-1 text-xs text-slate-600"><span
+                                        class="inline-block w-2 h-2 rounded-full bg-purple-500 shrink-0"></span>all
+                                    models</span>
+                                <span class="flex items-center gap-1 text-xs text-slate-600"><span
+                                        class="inline-block w-2 h-2 rounded-full bg-teal-500 shrink-0"></span>multiple
+                                    models</span>
+                            </div>
+                            <div class="flex flex-wrap gap-1.5">
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-purple-900/40 text-purple-300 border border-purple-500/30 font-medium">INDEX
+                                    FUNDS <span class="opacity-50 font-normal">32</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-purple-900/40 text-purple-300 border border-purple-500/30 font-medium">INDIVIDUAL
+                                    STOCKS <span class="opacity-50 font-normal">23</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-purple-900/40 text-purple-300 border border-purple-500/30 font-medium">RISK
+                                    <span class="opacity-50 font-normal">15</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">INDEX
+                                    FUNDS INDIVIDUAL <span class="opacity-50 font-normal">10</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">FUNDS
+                                    INDIVIDUAL STOCKS <span class="opacity-50 font-normal">10</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">MARKET
+                                    <span class="opacity-50 font-normal">14</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">TIME
+                                    <span class="opacity-50 font-normal">11</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">COMPANIES
+                                    <span class="opacity-50 font-normal">10</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">INVESTORS
+                                    <span class="opacity-50 font-normal">9</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">RETURNS
+                                    <span class="opacity-50 font-normal">7</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">LONG
+                                    <span class="opacity-50 font-normal">8</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">HIGHER
+                                    <span class="opacity-50 font-normal">6</span></span>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-2 mb-5 px-3 py-2 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                            <svg class="w-3.5 h-3.5 text-teal-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <div>
+                                <p class="text-xs font-semibold text-teal-400">Unique Timeline: Perplexity</p>
+                                <p class="text-xs text-slate-500">Contains 1 unique date(s) not referenced by others — may have more current information.</p>
+                            </div>
+                        </div>
+                        <div class="space-y-3 text-sm">
+                            <div>
+                                <p class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">Common
+                                    Ground</p>
+                                <p class="text-slate-300 leading-relaxed">All four models agree on the following:<br>•
+                                    <strong>Index funds are the better default</strong> for most investors, backed by
+                                    decades of evidence showing they outperform the majority of active stock pickers
+                                    over the long run.<br>• <strong>Individual stocks carry higher risk and
+                                        effort</strong> — they require significant research, emotional discipline, and
+                                    ongoing monitoring.<br>• A hybrid <strong>"core and satellite" approach</strong> is
+                                    a practical middle ground: index funds as the core (70–90%), with a smaller
+                                    allocation to individual stocks (10–30%).<br>• <strong>Low fees and
+                                        diversification</strong> are the primary advantages of index funds.<br>•
+                                    <strong>Consulting a financial advisor</strong> is recommended for personalized
+                                    guidance.</p>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-1">The Insight
+                                    Gap</p>
+                                <p class="text-slate-300 leading-relaxed">Each model brought something slightly
+                                    different:<br><br>• <strong>ChatGPT</strong> — Most beginner-friendly, offering a
+                                    simple rule of thumb and an 80/90–10/20 split suggestion. Also offered to explore
+                                    Singapore-specific investing, dividend vs. growth strategies.<br><br>•
+                                    <strong>Gemini</strong> — Most technically detailed. Uniquely mentioned advanced
+                                    strategies like <strong>selling covered calls and cash-secured puts</strong> on
+                                    individual stock holdings — a nuance no other model raised.<br><br>•
+                                    <strong>Claude</strong> — Leaned most heavily on the research consensus,
+                                    emphasising that even professional fund managers fail to beat the market. Added
+                                    practical prerequisites like having an emergency fund and being debt-free before
+                                    investing.<br><br>• <strong>Perplexity</strong> — The only model to cite specific
+                                    sources and tailor its answer to a <strong>Singapore-based investor</strong>,
+                                    recommending dividend ETFs like SCHD and VYM and noting CPF/SGX
+                                    considerations.</p>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-1">The Final
+                                    Verdict</p>
+                                <p class="text-slate-300 leading-relaxed">For most people, <strong>index funds are the
+                                        smarter starting point</strong> — and the evidence is hard to argue with.
+                                    Studies consistently show that over 90% of active stock pickers, including
+                                    professional fund managers, fail to beat a simple S&amp;P 500 or global index fund
+                                    over a 10–20 year horizon. Low fees, automatic diversification, and the ability to
+                                    automate contributions make them ideal for building long-term wealth with minimal
+                                    effort.<br><br><strong>Individual stocks aren't off the table</strong>, but they
+                                    demand real commitment: time to research, the emotional discipline to hold through
+                                    volatility, and a genuine understanding of financial statements and business models.
+                                    Without those, stock picking tends to hurt more than it helps.<br><br><strong>The
+                                        practical approach most models converge on:</strong><br>• Build your <strong>core
+                                        (70–90%) in low-cost index funds</strong> (e.g., VOO, VTI, VWRA, or regional
+                                    equivalents)<br>• Allocate a <strong>satellite portion (10–20%) to individual
+                                        stocks</strong> only if you have the interest, skill, and can treat it as risk
+                                    capital<br>• If you're more advanced, that satellite portion can also include income
+                                    strategies like <strong>covered calls or dividend-focused picks</strong><br><br>Before
+                                    investing in either, make sure you have an emergency fund, are free of high-interest
+                                    debt, and understand your own time horizon and risk tolerance.<br><br><strong>Bottom
+                                        line:</strong> Index funds first, individual stocks only if you've earned the
+                                    conviction to pick them.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel: Career -->
+                <div data-panel="career" class="hidden">
+                    <p class="text-xs text-slate-500 mb-5 font-mono">Prompt: "Is a university degree still worth it?"
+                    </p>
+
+                    <div class="grid sm:grid-cols-2 gap-3 mb-6">
+                        <div class="bg-slate-800/60 rounded-xl p-4 border border-slate-700">
+                            <span
+                                class="inline-block text-xs font-bold px-2 py-0.5 rounded-full bg-green-900/40 text-green-400 border border-green-500/30 mb-3">ChatGPT</span>
+                            <p class="text-xs text-slate-400 leading-relaxed max-h-36 overflow-y-auto ai-scroll pr-1">
+                                Yes — but it's no longer an automatic "go to uni and you'll succeed"
+                                situation.<br><br>A university degree is still worth it for many people, especially if
+                                the field has strong demand, the cost is reasonable, and the degree leads to skills
+                                employers actually need.<br><br><strong class="text-slate-300">Why degrees still
+                                    matter</strong><br>• Higher lifetime earnings and better job stability<br>• Access
+                                to professions that require credentials<br>• Networking and internship
+                                opportunities<br>• Broader career flexibility<br><br>Strong fields: software
+                                engineering, computer science, medicine, engineering, finance, and data/AI-related
+                                roles.<br><br><strong class="text-slate-300">Why people question it now</strong><br>•
+                                Tuition fees and student debt are much higher in some countries<br>• More people have
+                                degrees now, so degrees alone stand out less<br>• Some graduates end up
+                                underemployed<br>• AI and automation are reshaping white-collar work<br><br>The
+                                question today is less "Is any degree worth it?" and more: "Is <em>this</em> degree, at
+                                <em>this</em> cost, for <em>this</em> career path worth it?"<br><br><strong
+                                    class="text-slate-300">In Singapore specifically</strong><br>Degrees still carry
+                                strong signalling value, especially for government-linked roles, finance, law,
+                                healthcare, and corporate careers. But the gap is narrowing as skills-based hiring
+                                grows.<br><br><strong class="text-slate-300">Simple rule of thumb</strong><br>A degree
+                                is usually worth it if you know roughly what career you want, the field has decent
+                                demand, and the financial cost won't cripple you. It may be less worth it if you're
+                                taking on huge debt without a clear plan, or entering a field where portfolios and
+                                experience matter more than credentials.<br><br>The degree itself is no longer the
+                                finish line — it's more like a platform.</p>
+                        </div>
+                        <div class="bg-slate-800/60 rounded-xl p-4 border border-slate-700">
+                            <span
+                                class="inline-block text-xs font-bold px-2 py-0.5 rounded-full bg-orange-900/40 text-orange-400 border border-orange-500/30 mb-3">Claude</span>
+                            <p class="text-xs text-slate-400 leading-relaxed max-h-36 overflow-y-auto ai-scroll pr-1">
+                                Whether a university degree is worth it depends a lot on individual circumstances.<br><br><strong
+                                    class="text-slate-300">The case for a degree</strong><br>A degree still correlates
+                                with higher lifetime earnings in many fields. For certain professions (medicine, law,
+                                engineering, academia), a degree isn't optional — it's a legal or practical
+                                requirement. Universities also offer networking, structured learning environments, and
+                                credentials that many employers still use as a baseline filter.<br><br><strong
+                                    class="text-slate-300">The case against (or for alternatives)</strong><br>The cost
+                                has risen dramatically, and student debt can take decades to pay off. Many skills that
+                                employers actually want — coding, design, marketing, data analysis — can now be learned
+                                through bootcamps, online courses, or self-study at a fraction of the cost. Trade and
+                                vocational careers often pay very well and face chronic labor shortages. A growing
+                                number of major employers, including many tech companies, have dropped degree
+                                requirements altogether.<br><br><strong class="text-slate-300">It really depends
+                                    on</strong><br>• Your field — STEM, healthcare, and law still strongly reward
+                                degrees<br>• The specific institution and degree — a high-demand degree from a
+                                respected school is very different from a low-demand degree with heavy debt<br>• Your
+                                financial situation — a scholarship changes the calculus enormously<br>• What you want
+                                from it — many people value the intellectual experience and personal development for
+                                their own sake<br><br><strong class="text-slate-300">The bottom line:</strong> a degree
+                                is no longer a default "good investment" for everyone. For some people and careers it
+                                remains the clearest path forward; for others, alternatives now offer comparable or
+                                better outcomes.</p>
+                        </div>
+                        <div class="bg-slate-800/60 rounded-xl p-4 border border-slate-700">
+                            <span
+                                class="inline-block text-xs font-bold px-2 py-0.5 rounded-full bg-blue-900/40 text-blue-400 border border-blue-500/30 mb-3">Gemini</span>
+                            <p class="text-xs text-slate-400 leading-relaxed max-h-36 overflow-y-auto ai-scroll pr-1">
+                                The question has shifted from a simple "yes" to a more nuanced "it depends on your
+                                goals." While the financial ROI has tightened, the degree remains a powerful tool for
+                                career entry and long-term stability.<br><br><strong class="text-slate-300">The
+                                    Financial Logic</strong><br>Degree holders still earn significantly more over their
+                                lifetimes. In competitive markets like Singapore, the median monthly salary for degree
+                                holders can be more than double that of those with only secondary
+                                qualifications.<br>• The "Baseline" Effect: in many industries, a degree is often
+                                treated as a minimum requirement — automated resume filters may reject your application
+                                before a human sees it.<br>• The Breakeven Point: high-tuition private degrees in
+                                general subjects may take much longer to "pay off" compared to subsidized degrees in
+                                high-demand fields like computer science or medicine.<br><br><strong
+                                    class="text-slate-300">ROI Varies by Subject</strong><br>High ROI: Medicine, CS,
+                                Engineering, Architecture. Lower ROI: Journalism, Marketing, Social Work, General
+                                Humanities (without specialisation).<br><br><strong class="text-slate-300">Beyond the
+                                    Paycheck</strong><br>University serves as a structured environment for networking,
+                                internships, and developing soft skills like group dynamics and conflict resolution —
+                                a "safe space" to mature before entering the full-time workforce.<br><br><strong
+                                    class="text-slate-300">Rise of Alternative Pathways</strong><br>Specialized
+                                certifications, coding bootcamps, and apprenticeships are increasingly recognised by
+                                major employers (Google, Tesla) who prioritise "skills-first" hiring. In cybersecurity
+                                or cloud computing, a specific industry cert (CEH, AWS) can sometimes carry as much
+                                weight as a general IT degree for entry-level roles.</p>
+                        </div>
+                        <div class="bg-slate-800/60 rounded-xl p-4 border border-slate-700">
+                            <span
+                                class="inline-block text-xs font-bold px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-400 border border-teal-500/30 mb-3">Perplexity</span>
+                            <p class="text-xs text-slate-400 leading-relaxed max-h-36 overflow-y-auto ai-scroll pr-1">
+                                A university degree offers strong long-term financial and career benefits, especially in
+                                Singapore where graduates earn significantly more than non-degree holders, but its value
+                                depends on your field, costs, and alternatives.<br><br><strong
+                                    class="text-slate-300">Earnings Edge</strong><br>Degree holders in Singapore
+                                command a median monthly salary of S$8,656–S$9,038 in 2025, about 78% higher than
+                                diploma holders (~S$5,000) and double non-tertiary workers (S$3,450–S$4,200). This gap
+                                is projected to reach S$10,000 by 2030 for degrees amid rising demand in tech
+                                fields.<br><br><strong class="text-slate-300">Field Differences</strong><br>• Computing
+                                (CS/IS): 5.5x ROI, S$4,000 starting salary, 93–94% employment<br>• Engineering: 4.5–4.9x
+                                ROI, S$3,500–3,900, 86–88% employment<br>• Business Admin: 3–4.2x ROI, 81–93%
+                                employment<br>• Arts/Sciences (General): 2.6–3.8x ROI, only 59–74%
+                                employment<br><br><strong class="text-slate-300">Singapore Context</strong><br>Cultural
+                                pressure favours degrees, but alternatives like SkillsFuture-subsidized certs (OSCP,
+                                CEH) shine for IT professionals aiming at cybersecurity. Degrees waive CISSP experience
+                                (1 year), yet bootcamps offer faster entry at lower cost for mid-career switches. With
+                                the right background, certs + portfolio often match or beat degree outcomes without 3–4
+                                years of study.<br><br><span class="text-slate-600">· 20 sources cited</span></p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="flex-1 h-px bg-slate-700"></div>
+                        <div
+                            class="flex items-center gap-2 px-4 py-1.5 bg-indigo-900/30 rounded-full border border-indigo-500/30">
+                            <svg class="w-3 h-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                            <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">The Verdict
+                                Engine</span>
+                            <svg class="w-3 h-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                        <div class="flex-1 h-px bg-slate-700"></div>
+                    </div>
+
+                    <div class="bg-indigo-950/40 rounded-2xl p-6 border border-indigo-500/30">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse"></div>
+                                <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">The
+                                    Verdict</span>
+                            </div>
+                            <span
+                                class="text-xs px-2 py-0.5 rounded-full bg-green-900/40 text-green-400 border border-green-500/30 font-semibold">Lead:
+                                ChatGPT</span>
+                        </div>
+                        <details class="mb-4 group">
+                            <summary
+                                class="text-xs text-slate-500 cursor-pointer hover:text-slate-400 transition-colors flex items-center gap-1">
+                                <svg class="w-3 h-3 transition-transform group-open:rotate-90 shrink-0" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5l7 7-7 7"></path>
+                                </svg>
+                                View prompt used
+                            </summary>
+                            <div
+                                class="mt-2 text-xs text-slate-500 bg-slate-800/50 rounded-lg px-3 py-2 leading-relaxed border border-slate-700/50 space-y-1">
+                                <p class="italic">You are an expert at finding common ground. Your goal is to combine
+                                    multiple AI answers into one clear, single "Verdict".</p>
+                                <p>Current User Query: <span class="text-slate-400">"Is a university degree still worth
+                                        it?"</span></p>
+                                <p class="text-slate-600">[AI responses — collected automatically, one per model]</p>
+                                <p>Task:</p>
+                                <p>1. <span class="font-medium text-slate-400">Common Ground</span>: Briefly list what
+                                    all models agree on.</p>
+                                <p>2. <span class="font-medium text-slate-400">The Insight Gap</span>: Highlight unique
+                                    points or different views from individual models.</p>
+                                <p>3. <span class="font-medium text-slate-400">The Final Verdict</span>: Provide a
+                                    balanced summary that includes the best parts of every answer. Focus on being
+                                    accurate and clear, and mention any main differences between the models.</p>
+                                <p class="pt-1">Format using clean markdown with H3 headers (###).</p>
+                            </div>
+                        </details>
+                        <div class="mb-5">
+                            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mb-2">
+                                <span class="text-xs text-slate-500 font-medium">Key mentions</span>
+                                <span class="flex items-center gap-1 text-xs text-slate-600"><span
+                                        class="inline-block w-2 h-2 rounded-full bg-purple-500 shrink-0"></span>all
+                                    models</span>
+                                <span class="flex items-center gap-1 text-xs text-slate-600"><span
+                                        class="inline-block w-2 h-2 rounded-full bg-teal-500 shrink-0"></span>multiple
+                                    models</span>
+                            </div>
+                            <div class="flex flex-wrap gap-1.5">
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-purple-900/40 text-purple-300 border border-purple-500/30 font-medium">DEGREE
+                                    <span class="opacity-50 font-normal">41</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-purple-900/40 text-purple-300 border border-purple-500/30 font-medium">DEGREES
+                                    <span class="opacity-50 font-normal">20</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-purple-900/40 text-purple-300 border border-purple-500/30 font-medium">UNIVERSITY
+                                    <span class="opacity-50 font-normal">19</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-purple-900/40 text-purple-300 border border-purple-500/30 font-medium">WORTH
+                                    <span class="opacity-50 font-normal">15</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">SINGAPORE
+                                    <span class="opacity-50 font-normal">15</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">SKILLS
+                                    <span class="opacity-50 font-normal">11</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">CAREER
+                                    <span class="opacity-50 font-normal">10</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">FIELD
+                                    <span class="opacity-50 font-normal">9</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">DEGREE
+                                    HOLDERS <span class="opacity-50 font-normal">8</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">FIELDS
+                                    <span class="opacity-50 font-normal">7</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">ENGINEERING
+                                    <span class="opacity-50 font-normal">7</span></span>
+                                <span
+                                    class="text-xs px-2 py-0.5 rounded-full bg-teal-900/40 text-teal-300 border border-teal-500/30 font-medium">TECH
+                                    <span class="opacity-50 font-normal">7</span></span>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-2 mb-5 px-3 py-2 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                            <svg class="w-3.5 h-3.5 text-teal-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <div>
+                                <p class="text-xs font-semibold text-teal-400">Unique Timeline: Perplexity</p>
+                                <p class="text-xs text-slate-500">Contains 2 unique date(s) not referenced by others — may have more current information.</p>
+                            </div>
+                        </div>
+                        <div class="space-y-3 text-sm">
+                            <div>
+                                <p class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">Common
+                                    Ground</p>
+                                <p class="text-slate-300 leading-relaxed">All four models broadly agree on a few key
+                                    points:<br>• A university degree is still valuable overall, especially for
+                                    long-term earnings and career stability.<br>• The value of a degree is <strong>no
+                                        longer automatic</strong> — it depends heavily on the subject, cost, career
+                                    goals, and job market demand.<br>• Degrees remain important or mandatory for
+                                    regulated professions like medicine, law, engineering, and some finance or
+                                    healthcare roles.<br>• <strong>Practical experience now matters much more</strong>
+                                    than before: internships, portfolios, networking, and real-world projects.<br>•
+                                    <strong>Alternatives to university are stronger</strong> than in the past:
+                                    certifications, apprenticeships, bootcamps, online learning, and skilled
+                                    trades.<br>• Tech and creative fields increasingly use <strong>skills-based
+                                        hiring</strong> rather than relying purely on credentials.<br>• Student debt
+                                    and rising tuition have weakened the "guaranteed ROI" of many degrees.</p>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-1">The Insight
+                                    Gap</p>
+                                <p class="text-slate-300 leading-relaxed">Each model added different strengths or
+                                    perspectives:<br><br>• <strong>ChatGPT</strong> — Best at framing the modern
+                                    reality: "The degree itself is no longer the finish line — it's more like a
+                                    platform." Strong emphasis on how AI and automation are changing white-collar work.
+                                    Included useful Singapore-specific context around signalling value.<br><br>•
+                                    <strong>Gemini</strong> — Added the idea of university as a "safe space" to mature,
+                                    build soft skills, and explore career direction. Strong explanation of the
+                                    "baseline filter" effect: many employers still use degrees as an initial screening
+                                    requirement. Highlighted international mobility and visa advantages.<br><br>•
+                                    <strong>Claude</strong> — Most balanced and concise. Strong focus on personal
+                                    circumstances: financial situation, institution quality, and life goals. Emphasised
+                                    that university can still have non-financial value — intellectual growth, social
+                                    experience, and personal development.<br><br>• <strong>Perplexity</strong> — Most
+                                    data-heavy and Singapore-focused. Provided detailed salary and ROI comparisons
+                                    between fields. Highlighted that mid-career professionals may benefit more from
+                                    targeted certifications than full degrees. Brought in examples from cybersecurity
+                                    and IT where skills and certifications can compete with degrees.</p>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-blue-400 uppercase tracking-wider mb-1">The Final
+                                    Verdict</p>
+                                <p class="text-slate-300 leading-relaxed">A university degree is still worth it for
+                                    many people — but it is no longer a universal "safe bet."<br><br>The strongest
+                                    consensus is that the real question today is not "Is university worth it?" but
+                                    rather: <strong>"Is this specific degree, for this career path, at this cost, worth
+                                        it?"</strong><br><br>Degrees still provide major advantages: higher average
+                                    lifetime earnings, better employment stability, access to regulated professions,
+                                    stronger international job mobility, and easier entry into corporate hiring
+                                    pipelines. In Singapore, degrees also continue to carry strong signalling value,
+                                    especially in government-linked sectors, finance, healthcare, engineering, and large
+                                    corporations.<br><br>However, the landscape has changed significantly — tuition
+                                    costs are higher, graduate competition is stronger, and employers increasingly care
+                                    about demonstrated skills. The ROI varies dramatically by field: STEM, healthcare,
+                                    engineering, computing, and some finance degrees still offer strong returns, while
+                                    more general or lower-demand degrees may require far more initiative to produce
+                                    strong career outcomes.<br><br>Alternatives are more credible than ever before. In
+                                    software development, cybersecurity, digital marketing, design, and
+                                    entrepreneurship, certifications, portfolios, and real-world experience can
+                                    sometimes compete with — or outperform — a traditional degree pathway. Perplexity
+                                    strongly argues that experienced mid-career professionals may gain more from
+                                    targeted upskilling than returning for a full degree.<br><br><strong>The clearest
+                                        overall conclusion:</strong><br>• A degree is still highly valuable when tied
+                                    to a clear career path with strong demand.<br>• It becomes less worthwhile when
+                                    pursued without direction, with excessive debt, or in fields where employers mainly
+                                    care about proven skill.<br><br>Today, a degree is best viewed as one powerful
+                                    career tool — not the only path to success, and no longer enough on its own without
+                                    practical experience and adaptability.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- end interactive demo -->
+        </div>
+    </section>
+
+    <!-- Pricing -->
+    <section id="pricing" class="py-24 px-6 relative bg-slate-900/50">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Simple, Transparent Pricing</h2>
+                <p class="text-xl text-slate-400">Pay once. Use forever. No subscriptions.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+
+                <!-- Free Tier -->
+                <div class="glass p-8 rounded-3xl border border-slate-700 flex flex-col">
+                    <h3 class="text-2xl font-bold mb-2">Free</h3>
+                    <p class="text-slate-400 mb-6">A powerful starting point for AI research.</p>
+                    <div class="text-4xl font-bold mb-8">$0</div>
+                    <ul class="space-y-4 mb-10 flex-1">
+                        <li class="flex items-center gap-3 text-slate-300">
+                            <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Side-by-side AI comparison
+                        </li>
+                        <li class="flex items-center gap-3 text-slate-300">
+                            <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            ChatGPT and Gemini
+                        </li>
+                        <li class="flex items-center gap-3 text-slate-300">
+                            <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Real-time streaming responses
+                        </li>
+                        <li class="flex items-center gap-3 text-slate-300">
+                            <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Dashboard and River layouts
+                        </li>
+                        <li class="flex items-center gap-3 text-slate-300">
+                            <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Multi-turn conversations
+                        </li>
+                        <li class="flex items-center gap-3 text-slate-500">
+                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            Claude and Perplexity
+                        </li>
+                        <li class="flex items-center gap-3 text-slate-500">
+                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            The Verdict Engine
+                        </li>
+                    </ul>
+                    <span
+                        class="w-full py-4 rounded-xl font-bold text-center bg-slate-800 text-slate-500 cursor-not-allowed select-none block">
+                        Free — Available at Launch
+                    </span>
+                </div>
+
+                <!-- Pro Tier -->
+                <div
+                    class="glass p-8 rounded-3xl border-2 border-blue-500 relative flex flex-col transform md:-translate-y-4 shadow-[0_0_40px_rgba(59,130,246,0.3)]">
+                    <div
+                        class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-1 rounded-full text-sm font-bold shadow-lg whitespace-nowrap">
+                        ONE-TIME PAYMENT
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">Pro Lifetime</h3>
+                    <p class="text-slate-300 mb-6">Unlock the full power of AI Verdict forever.</p>
+                    <div class="text-4xl font-bold mb-8">$39.99</div>
+                    <ul class="space-y-4 mb-10 flex-1">
+                        <li class="flex items-center gap-3 text-slate-200">
+                            <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Everything in Free
+                        </li>
+                        <li class="flex items-center gap-3 text-slate-200">
+                            <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Claude and Perplexity
+                        </li>
+                        <li class="flex items-center gap-3 text-slate-200">
+                            <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            The Verdict Engine
+                        </li>
+                        <li class="flex items-center gap-3 text-slate-200">
+                            <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Customizable Verdict Lead
+                        </li>
+                        <li class="flex items-center gap-3 text-slate-200">
+                            <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Custom Verdict Prompts
+                        </li>
+                    </ul>
+                    <a href="https://aiverdict.lemonsqueezy.com/checkout/buy/1f2a6fac-df98-4671-b08b-9106aafd8aeb"
+                        target="_blank" rel="noopener" onclick="gtag('event', 'pro_click', { location: 'pricing' })"
+                        class="w-full py-4 rounded-xl font-bold text-center bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-500 hover:to-indigo-500 transition-all shadow-lg hover:shadow-blue-500/50 block">
+                        Pre-order Pro - $39.99
+                    </a>
+                    <p class="text-xs text-center text-slate-500 mt-3">You will receive your license key by email.
+                        Redeem it when the extension launches.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="py-24 px-6">
+        <div class="max-w-3xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
+                <p class="text-slate-400">Still have questions? Email us at <a href="mailto:aiverdict@proton.me"
+                        class="text-blue-400 hover:underline">aiverdict@proton.me</a></p>
+            </div>
+            <div class="space-y-3">
+
+                <details class="glass rounded-xl group cursor-pointer">
+                    <summary class="flex justify-between items-center p-6 font-semibold text-white">
+                        Do I need API keys to use AI Verdict?
+                        <svg class="w-5 h-5 text-slate-400 shrink-0 transition-transform group-open:rotate-180"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                            </path>
+                        </svg>
+                    </summary>
+                    <p class="px-6 pb-6 text-sm text-slate-400 leading-relaxed">No. AI Verdict uses your existing
+                        browser sessions - the same accounts you already use to access ChatGPT, Claude, Gemini, and
+                        Perplexity. No API keys, no developer accounts, no extra billing from AI providers.</p>
+                </details>
+
+                <details class="glass rounded-xl group cursor-pointer">
+                    <summary class="flex justify-between items-center p-6 font-semibold text-white">
+                        Do I need to be logged in to each AI service?
+                        <svg class="w-5 h-5 text-slate-400 shrink-0 transition-transform group-open:rotate-180"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                            </path>
+                        </svg>
+                    </summary>
+                    <p class="px-6 pb-6 text-sm text-slate-400 leading-relaxed">Not always. ChatGPT, Gemini, and
+                        Perplexity work without logging in for basic use. Logging in is recommended if you want to save
+                        conversation history. Claude does require you to be signed in. Most users are already logged
+                        into these services in their browser, so setup is instant.</p>
+                </details>
+
+                <details class="glass rounded-xl group cursor-pointer">
+                    <summary class="flex justify-between items-center p-6 font-semibold text-white">
+                        Which browsers are supported?
+                        <svg class="w-5 h-5 text-slate-400 shrink-0 transition-transform group-open:rotate-180"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                            </path>
+                        </svg>
+                    </summary>
+                    <p class="px-6 pb-6 text-sm text-slate-400 leading-relaxed">Chrome is fully supported. Other Chromium-based browsers (Edge, Brave, Arc) should be compatible but are untested. Firefox is in development.</p>
+                </details>
+
+                <details class="glass rounded-xl group cursor-pointer">
+                    <summary class="flex justify-between items-center p-6 font-semibold text-white">
+                        Is this a monthly subscription?
+                        <svg class="w-5 h-5 text-slate-400 shrink-0 transition-transform group-open:rotate-180"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                            </path>
+                        </svg>
+                    </summary>
+                    <p class="px-6 pb-6 text-sm text-slate-400 leading-relaxed">No. AI Verdict Pro is a one-time payment
+                        of $39.99 for lifetime access. No recurring charges, no annual renewals.</p>
+                </details>
+
+                <details class="glass rounded-xl group cursor-pointer">
+                    <summary class="flex justify-between items-center p-6 font-semibold text-white">
+                        Is my data private? Does AI Verdict see my prompts?
+                        <svg class="w-5 h-5 text-slate-400 shrink-0 transition-transform group-open:rotate-180"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                            </path>
+                        </svg>
+                    </summary>
+                    <p class="px-6 pb-6 text-sm text-slate-400 leading-relaxed">Your prompts and AI responses never
+                        touch our servers. Everything runs locally in your browser, directly between you and the AI
+                        services you are already using. We have a Local-First design philosophy. See our <a
+                            href="privacy.html" class="text-blue-400 hover:underline">Privacy Policy</a> for full
+                        details.</p>
+                </details>
+
+                <details class="glass rounded-xl group cursor-pointer">
+                    <summary class="flex justify-between items-center p-6 font-semibold text-white">
+                        What exactly is The Verdict Engine?
+                        <svg class="w-5 h-5 text-slate-400 shrink-0 transition-transform group-open:rotate-180"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                            </path>
+                        </svg>
+                    </summary>
+                    <p class="px-6 pb-6 text-sm text-slate-400 leading-relaxed">The Verdict Engine is a Pro feature that
+                        collects all active AI responses and sends them to a lead model you choose. That model
+                        synthesizes a consensus, highlighting where they agree, where they differ, and what the most
+                        reliable answer is. You can also override the default summarization prompt with your own
+                        instructions - ask for a pros/cons list, a structured comparison, a recommendation, or any
+                        format that suits your workflow.</p>
+                </details>
+
+                <details class="glass rounded-xl group cursor-pointer">
+                    <summary class="flex justify-between items-center p-6 font-semibold text-white">
+                        Can I use AI Verdict with free-tier AI accounts?
+                        <svg class="w-5 h-5 text-slate-400 shrink-0 transition-transform group-open:rotate-180"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                            </path>
+                        </svg>
+                    </summary>
+                    <p class="px-6 pb-6 text-sm text-slate-400 leading-relaxed">Yes. AI Verdict works with free accounts
+                        across all supported models. Some platform-level restrictions from the AI providers themselves
+                        (such as rate limits on free tiers) may still apply.</p>
+                </details>
+
+                <details class="glass rounded-xl group cursor-pointer">
+                    <summary class="flex justify-between items-center p-6 font-semibold text-white">
+                        What if one AI is down or I am not logged in?
+                        <svg class="w-5 h-5 text-slate-400 shrink-0 transition-transform group-open:rotate-180"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                            </path>
+                        </svg>
+                    </summary>
+                    <p class="px-6 pb-6 text-sm text-slate-400 leading-relaxed">That model's panel will show an error or
+                        a prompt to sign in. The other models continue to work normally. AI Verdict is designed to be
+                        resilient to individual model failures.</p>
+                </details>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-6 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+            <a href="index.html" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                <img src="icon-128.png" alt="AI Verdict Logo" class="w-6 h-6 rounded">
+                <span class="font-bold text-slate-300">AI Verdict</span>
+            </a>
+            <div class="flex gap-8 text-sm text-slate-500">
+                <a href="privacy.html" class="hover:text-white transition-colors">Privacy Policy</a>
+                <a href="mailto:aiverdict@proton.me" class="hover:text-white transition-colors">Support</a>
+            </div>
+            <p class="text-sm text-slate-600">© <span id="year"></span> AI Verdict. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Screenshot lightbox -->
+    <div id="ss-lightbox" role="dialog" aria-modal="true" aria-label="Screenshot preview">
+        <button id="ss-lightbox-close" aria-label="Close preview">&times;</button>
+        <img id="ss-lightbox-img" src="" alt="">
+    </div>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Screenshot showcase tab switcher
+        const ssTabs = Array.from(document.querySelectorAll('.ss-tab'));
+        const ssPanels = document.querySelectorAll('[data-ss-panel]');
+        let ssIndex = 0;
+
+        function ssActivate(index) {
+            ssIndex = index;
+            ssTabs.forEach((b, i) => {
+                const active = i === index;
+                b.classList.toggle('ss-active', active);
+                b.classList.toggle('bg-slate-700', active);
+                b.classList.toggle('text-white', active);
+                b.classList.toggle('border-slate-600', active);
+                b.classList.toggle('text-slate-400', !active);
+                b.classList.toggle('border-slate-700/50', !active);
+            });
+            ssPanels.forEach((p, i) => p.classList.toggle('ss-visible', i === index));
+        }
+
+        ssTabs.forEach((btn, i) => btn.addEventListener('click', () => ssActivate(i)));
+        ssActivate(0);
+
+        // Screenshot lightbox
+        const lightbox = document.getElementById('ss-lightbox');
+        const lightboxImg = document.getElementById('ss-lightbox-img');
+
+        document.querySelectorAll('.ss-img').forEach(img => {
+            img.addEventListener('click', () => {
+                lightboxImg.src = img.src;
+                lightboxImg.alt = img.alt;
+                lightbox.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+        function closeLightbox() {
+            lightbox.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        lightbox.addEventListener('click', closeLightbox);
+        document.getElementById('ss-lightbox-close').addEventListener('click', e => {
+            e.stopPropagation();
+            closeLightbox();
+        });
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeLightbox();
+        });
+
+        // Verdict Engine tab switcher
+        const tabs = document.querySelectorAll('.verdict-tab');
+        const panels = document.querySelectorAll('[data-panel]');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => {
+                    t.classList.remove('active-tab', 'bg-slate-700', 'text-white');
+                    t.classList.add('text-slate-400');
+                });
+                panels.forEach(p => p.classList.add('hidden'));
+
+                tab.classList.add('active-tab', 'bg-slate-700', 'text-white');
+                tab.classList.remove('text-slate-400');
+                document.querySelector(`[data-panel="${tab.dataset.tab}"]`).classList.remove('hidden');
+
+                gtag('event', 'verdict_tab', { tab: tab.dataset.tab });
+            });
+        });
+
+        // FAQ open tracking
+        document.querySelectorAll('#faq details').forEach(detail => {
+            detail.addEventListener('toggle', () => {
+                if (detail.open) {
+                    const label = detail.querySelector('summary').textContent.trim().slice(0, 40);
+                    gtag('event', 'faq_open', { question: label });
+                }
+            });
+        });
+
+        // Set initial active tab style
+        document.querySelector('.active-tab').classList.add('bg-slate-700', 'text-white');
+    </script>
+</body>
+
 </html>
