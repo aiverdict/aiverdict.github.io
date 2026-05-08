@@ -224,11 +224,26 @@
                 <a href="#pricing" class="hover:text-white transition-colors">Pricing</a>
                 <a href="#faq" class="hover:text-white transition-colors">FAQ</a>
             </div>
-            <a href="https://aiverdict.lemonsqueezy.com/checkout/buy/1f2a6fac-df98-4671-b08b-9106aafd8aeb"
-                target="_blank" rel="noopener" onclick="gtag('event', 'pro_click', { location: 'navbar' })"
-                class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-5 py-2 rounded-full text-sm font-bold hover:from-blue-500 hover:to-indigo-500 transition-all shadow-lg">
-                Get Pro - $39.99
-            </a>
+            <div class="flex items-center gap-3">
+                <a href="https://aiverdict.lemonsqueezy.com/checkout/buy/1f2a6fac-df98-4671-b08b-9106aafd8aeb"
+                    target="_blank" rel="noopener" onclick="gtag('event', 'pro_click', { location: 'navbar' })"
+                    class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-5 py-2 rounded-full text-sm font-bold hover:from-blue-500 hover:to-indigo-500 transition-all shadow-lg">
+                    Get Pro - $39.99
+                </a>
+                <button id="hamburger" aria-label="Open menu" class="md:hidden flex flex-col justify-center gap-1.5 w-8 h-8">
+                    <span class="hamburger-line block h-0.5 w-6 bg-slate-300 rounded transition-all duration-300"></span>
+                    <span class="hamburger-line block h-0.5 w-6 bg-slate-300 rounded transition-all duration-300"></span>
+                    <span class="hamburger-line block h-0.5 w-6 bg-slate-300 rounded transition-all duration-300"></span>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-slate-700/50 px-6 py-4 flex flex-col gap-4 text-sm font-medium text-slate-400">
+            <a href="#how-it-works" class="hover:text-white transition-colors mobile-nav-link">How it Works</a>
+            <a href="#features" class="hover:text-white transition-colors mobile-nav-link">Features</a>
+            <a href="#verdict-engine" class="hover:text-white transition-colors mobile-nav-link">The Verdict</a>
+            <a href="#pricing" class="hover:text-white transition-colors mobile-nav-link">Pricing</a>
+            <a href="#faq" class="hover:text-white transition-colors mobile-nav-link">FAQ</a>
         </div>
     </nav>
 
@@ -273,7 +288,7 @@
     </header>
 
     <!-- Screenshot Showcase -->
-    <section class="px-6 mb-20">
+    <section class="px-6 mb-12">
         <div class="max-w-7xl mx-auto">
             <!-- Tab switcher -->
             <div class="flex items-center justify-center gap-2 mb-6 flex-wrap">
@@ -347,7 +362,7 @@
     </section>
 
     <!-- How it Works -->
-    <section id="how-it-works" class="py-20 px-6">
+    <section id="how-it-works" class="py-14 px-6">
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-16">
                 <h2 class="text-3xl font-bold mb-4">How it Works</h2>
@@ -389,7 +404,7 @@
     </section>
 
     <!-- Features Section -->
-    <section id="features" class="py-20 px-6 bg-slate-900/40">
+    <section id="features" class="py-14 px-6 bg-slate-900/40">
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-16">
                 <h2 class="text-3xl font-bold mb-4">Everything You Need to <span
@@ -520,7 +535,7 @@
     </section>
 
     <!-- The Verdict Engine Deep Dive -->
-    <section id="verdict-engine" class="py-24 px-6">
+    <section id="verdict-engine" class="py-14 px-6">
         <div class="max-w-7xl mx-auto">
 
             <!-- Header -->
@@ -2007,7 +2022,7 @@
     </section>
 
     <!-- Pricing -->
-    <section id="pricing" class="py-24 px-6 relative bg-slate-900/50">
+    <section id="pricing" class="py-14 px-6 relative bg-slate-900/50">
         <div class="max-w-5xl mx-auto">
             <div class="text-center mb-16">
                 <h2 class="text-4xl font-bold mb-4">Simple, Transparent Pricing</h2>
@@ -2148,7 +2163,7 @@
     </section>
 
     <!-- FAQ -->
-    <section id="faq" class="py-24 px-6">
+    <section id="faq" class="py-14 px-6">
         <div class="max-w-3xl mx-auto">
             <div class="text-center mb-16">
                 <h2 class="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
@@ -2291,6 +2306,11 @@
         </div>
     </footer>
 
+    <!-- Back to top -->
+    <button id="back-to-top" aria-label="Back to top" class="fixed bottom-8 right-8 z-50 w-10 h-10 rounded-full bg-slate-700 hover:bg-slate-600 border border-slate-600 text-slate-300 hover:text-white flex items-center justify-center shadow-lg transition-all duration-300 opacity-0 pointer-events-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+    </button>
+
     <!-- Screenshot lightbox -->
     <div id="ss-lightbox" role="dialog" aria-modal="true" aria-label="Screenshot preview">
         <button id="ss-lightbox-close" aria-label="Close preview">&times;</button>
@@ -2382,6 +2402,25 @@
 
         // Set initial active tab style
         document.querySelector('.active-tab').classList.add('bg-slate-700', 'text-white');
+
+        // Hamburger menu
+        const hamburger = document.getElementById('hamburger');
+        const mobileMenu = document.getElementById('mobile-menu');
+        hamburger.addEventListener('click', () => {
+            const open = !mobileMenu.classList.contains('hidden');
+            mobileMenu.classList.toggle('hidden', open);
+        });
+        document.querySelectorAll('.mobile-nav-link').forEach(link => {
+            link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+        });
+
+        // Back to top
+        const backToTop = document.getElementById('back-to-top');
+        window.addEventListener('scroll', () => {
+            backToTop.classList.toggle('opacity-0', window.scrollY < 400);
+            backToTop.classList.toggle('pointer-events-none', window.scrollY < 400);
+        });
+        backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
     </script>
 </body>
 
