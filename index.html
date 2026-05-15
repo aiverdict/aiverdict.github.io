@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Verdict - Compare ChatGPT, Claude, Gemini and Perplexity Side-by-Side</title>
     <meta name="description"
-        content="AI Verdict is a Chrome extension that queries ChatGPT, Claude, Gemini, and Perplexity simultaneously, then synthesizes a consensus verdict. No API keys required.">
+        content="AI Verdict is a browser extension that queries ChatGPT, Claude, Gemini, and Perplexity simultaneously, then synthesizes a consensus verdict. No API keys required.">
     <meta name="keywords"
-        content="AI comparison tool, compare ChatGPT Claude Gemini Perplexity, AI Chrome extension, LLM comparison, AI consensus, AI verdict">
+        content="AI comparison tool, compare ChatGPT Claude Gemini Perplexity, AI Chrome extension, AI Firefox extension, Firefox add-on, LLM comparison, AI consensus, AI verdict">
     <link rel="canonical" href="https://aiverdict.github.io/">
     <link rel="icon" type="image/png" href="icon-128.png">
 
@@ -35,7 +35,7 @@
       "@type": "SoftwareApplication",
       "name": "AI Verdict",
       "url": "https://aiverdict.github.io/",
-      "operatingSystem": "Chrome",
+      "operatingSystem": "Chrome, Firefox",
       "applicationCategory": "BrowserApplication",
       "description": "Compare ChatGPT, Claude, Gemini, and Perplexity side-by-side with a single prompt. Pro tier includes The Verdict Engine for AI consensus synthesis.",
       "offers": [
@@ -252,7 +252,7 @@
         <div class="max-w-4xl mx-auto">
             <span
                 class="inline-block px-4 py-1 rounded-full bg-blue-900/30 text-blue-400 text-xs font-bold mb-6 border border-blue-500/30">
-                NOW AVAILABLE ON CHROME WEB STORE
+                NOW AVAILABLE ON CHROME &amp; FIREFOX
             </span>
             <h1 class="text-5xl md:text-7xl font-bold mb-6 text-glow tracking-tight leading-tight">
                 One Prompt.<br><span
@@ -272,18 +272,26 @@
                 <a href="https://chrome.google.com/webstore/detail/kllmlhlkccdmdlgapecopfdgdgbigjhp"
                     target="_blank" rel="noopener" onclick="gtag('event', 'free_click', { location: 'hero' })"
                     class="bg-slate-700/60 border border-slate-600 text-white px-8 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 hover:bg-slate-600/60 transition-all">
-                    Add to Chrome — Free
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="12" fill="white"/>
+                      <path fill="#EA4335" d="M1.61 6 A12 12 0 0 1 22.39 6 L18.06 8.5 A7 7 0 0 0 5.94 8.5 Z"/>
+                      <path fill="#FBBC05" d="M22.39 6 A12 12 0 0 1 12 24 L12 19 A7 7 0 0 0 18.06 8.5 Z"/>
+                      <path fill="#34A853" d="M12 24 A12 12 0 0 1 1.61 6 L5.94 8.5 A7 7 0 0 0 12 19 Z"/>
+                      <circle cx="12" cy="12" r="6.5" fill="white"/>
+                      <circle cx="12" cy="12" r="5" fill="#4285F4"/>
                     </svg>
+                    Add to Chrome (Free)
+                </a>
+                <a href="https://addons.mozilla.org/en-US/firefox/addon/ai-verdict/"
+                    target="_blank" rel="noopener" onclick="gtag('event', 'free_click', { location: 'hero_firefox' })"
+                    class="bg-slate-700/60 border border-slate-600 text-white px-8 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 hover:bg-slate-600/60 transition-all">
+                    <img src="firefox-logo.svg" class="w-5 h-5 shrink-0" alt="">
+                    Add to Firefox (Free)
                 </a>
                 <a href="https://aiverdict.lemonsqueezy.com/checkout/buy/1f2a6fac-df98-4671-b08b-9106aafd8aeb"
                     target="_blank" rel="noopener" onclick="gtag('event', 'pro_click', { location: 'hero' })"
                     class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 hover:from-blue-500 hover:to-indigo-500 transition-all shadow-lg hover:shadow-blue-500/50">
                     Get Pro Lifetime - $39.99
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                    </svg>
                 </a>
             </div>
         </div>
@@ -2094,11 +2102,18 @@
                             The Verdict Engine
                         </li>
                     </ul>
-                    <a href="https://chrome.google.com/webstore/detail/kllmlhlkccdmdlgapecopfdgdgbigjhp"
-                        target="_blank" rel="noopener" onclick="gtag('event', 'free_click', { location: 'pricing' })"
-                        class="w-full py-4 rounded-xl font-bold text-center bg-slate-700 text-white hover:bg-slate-600 transition-all block">
-                        Add to Chrome — Free
-                    </a>
+                    <div class="space-y-2">
+                        <a href="https://chrome.google.com/webstore/detail/kllmlhlkccdmdlgapecopfdgdgbigjhp"
+                            target="_blank" rel="noopener" onclick="gtag('event', 'free_click', { location: 'pricing' })"
+                            class="w-full py-4 rounded-xl font-bold text-center bg-slate-700 text-white hover:bg-slate-600 transition-all block">
+                            Add to Chrome (Free)
+                        </a>
+                        <a href="https://addons.mozilla.org/en-US/firefox/addon/ai-verdict/"
+                            target="_blank" rel="noopener" onclick="gtag('event', 'free_click', { location: 'pricing_firefox' })"
+                            class="w-full py-4 rounded-xl font-bold text-center bg-slate-700 text-white hover:bg-slate-600 transition-all block">
+                            Add to Firefox (Free)
+                        </a>
+                    </div>
                 </div>
 
                 <!-- Pro Tier -->
@@ -2212,7 +2227,7 @@
                             </path>
                         </svg>
                     </summary>
-                    <p class="px-6 pb-6 text-sm text-slate-400 leading-relaxed">Chrome and all Chromium-based browsers including Edge, Brave, and Arc. Firefox support is in development.</p>
+                    <p class="px-6 pb-6 text-sm text-slate-400 leading-relaxed">Chrome and all Chromium-based browsers including Edge, Brave, and Arc, as well as Firefox.</p>
                 </details>
 
                 <details class="glass rounded-xl group cursor-pointer">
