@@ -206,16 +206,6 @@
             scrollbar-width: none;
         }
 
-        #mobile-menu {
-            overflow: hidden;
-            max-height: 0;
-            transition: max-height 0.3s ease;
-        }
-
-        #mobile-menu.open {
-            max-height: 300px;
-        }
-
         .ss-img-wrap {
             position: relative;
             display: block;
@@ -272,7 +262,7 @@
             </div>
         </div>
         <!-- Mobile menu -->
-        <div id="mobile-menu" class="md:hidden border-t border-slate-700/50 px-6 py-4 flex flex-col gap-4 text-sm font-medium text-slate-400">
+        <div id="mobile-menu" class="hidden md:hidden border-t border-slate-700/50 px-6 py-4 flex flex-col gap-4 text-sm font-medium text-slate-400">
             <a href="#how-it-works" class="hover:text-white transition-colors mobile-nav-link">How it Works</a>
             <a href="#features" class="hover:text-white transition-colors mobile-nav-link">Features</a>
             <a href="#verdict-engine" class="hover:text-white transition-colors mobile-nav-link">The Verdict</a>
@@ -2493,10 +2483,10 @@
         const hamburger = document.getElementById('hamburger');
         const mobileMenu = document.getElementById('mobile-menu');
         hamburger.addEventListener('click', () => {
-            mobileMenu.classList.toggle('open');
+            mobileMenu.classList.toggle('hidden');
         });
         document.querySelectorAll('.mobile-nav-link').forEach(link => {
-            link.addEventListener('click', () => mobileMenu.classList.remove('open'));
+            link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
         });
 
         // Back to top
