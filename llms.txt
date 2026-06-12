@@ -1,0 +1,22 @@
+# AI Verdict
+
+> AI Verdict is a browser extension for Chrome, Firefox, and Edge that sends one prompt to ChatGPT (OpenAI), Claude (Anthropic), Gemini (Google), and Perplexity AI simultaneously, then synthesizes their responses into a consensus verdict. No API keys required — uses your existing browser sessions.
+
+## Key Pages
+
+- [Home](https://aiverdict.github.io/): Product overview, features, pricing, and FAQ
+- [Privacy Policy](https://aiverdict.github.io/privacy.html): Local-First data philosophy — prompts and responses never leave your browser
+
+## Product
+
+- Free tier: ChatGPT and Gemini, real-time streaming, dashboard and river layouts, multi-turn conversations
+- Pro Lifetime ($39.99 one-time): All four models plus The Verdict Engine — AI consensus synthesis with customizable lead model and verdict prompts
+- Available on: Chrome Web Store, Firefox Add-ons, Microsoft Edge Add-ons
+
+## The Verdict Engine
+
+A Pro feature that collects all active AI responses, sends them to a lead model you choose, and synthesizes a single consensus — highlighting where models agree, where they differ, and what the most reliable answer is. The summarization prompt is fully customizable.
+
+## Contact
+
+aiverdict@proton.me
